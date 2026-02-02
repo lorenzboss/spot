@@ -28,7 +28,7 @@ export default function Home() {
 
 function SignInForm() {
   return (
-    <main className="flex min-h-[calc(100vh-60px)] flex-col items-center justify-center gap-8 p-8">
+    <main className="flex h-[calc(100dvh-60px)] flex-col items-center justify-center gap-8 overflow-auto p-8">
       <div className="rounded-xl border-2 p-12 text-center">
         <h1 className="mb-4 text-center text-4xl font-bold">Spot</h1>
         <p className="whitespace-nowrap sm:text-lg">
@@ -49,7 +49,7 @@ function Content() {
   }
 
   return (
-    <main className="container mx-auto flex min-h-[calc(100vh-59px)] flex-col items-center justify-center gap-8 p-4 sm:p-8">
+    <main className="container mx-auto flex h-[calc(100dvh-59px)] flex-col items-center justify-center gap-8 overflow-auto p-4 sm:p-8">
       <MemoryGame title="Offline Mode" description="Play alone and train your memory!" />
     </main>
   );
