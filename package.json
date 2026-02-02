@@ -26,6 +26,7 @@
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@workos-inc/authkit-nextjs": "^2.13.0",
     "convex": "^1.31.6",
+    "lucide-react": "^0.563.0",
     "next": "^16.1.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"

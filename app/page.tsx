@@ -1,5 +1,6 @@
 'use client';
 
+import MemoryGame from '@/components/MemoryGame';
 import { useAuth } from '@workos-inc/authkit-nextjs/components';
 import type { User } from '@workos-inc/node';
 import { Authenticated, Unauthenticated } from 'convex/react';
@@ -48,9 +49,8 @@ function Content() {
   }
 
   return (
-    <main className="container mx-auto flex min-h-[calc(100vh-59px)] flex-col items-center justify-center gap-8 p-8">
-      <p className="text-center">{user.email}</p>
-      <p>Hello how are you today?</p>
+    <main className="container mx-auto flex min-h-[calc(100vh-59px)] flex-col items-center justify-center gap-8 p-4 sm:p-8">
+      <MemoryGame title="Offline Mode" description="Play alone and train your memory!" />
     </main>
   );
 }
