@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: 'Spot',
   description: 'A memory game where you Select Pairs Online Together',
   icons: {
-    icon: '/convex.svg',
+    icon: '/icon.svg',
   },
 };
 
