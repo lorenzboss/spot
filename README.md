@@ -1,6 +1,8 @@
-# Welcome to your Convex + Next.js + WorkOS AuthKit app
+# Spot - Select Pairs Online Together
 
-This is a [Convex](https://convex.dev/) project migrated to use WorkOS AuthKit for authentication.
+A memory matching game where you can Select Pairs Online Together.
+
+> **Spot** stands for **S**elect **P**airs **O**nline **T**ogether - because finding matching pairs is better with friends!
 
 After the initial setup (<2 minutes) you'll have a working full-stack app using:
 
