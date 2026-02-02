@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --link: #2563eb;
 }
 
 @theme inline {
@@ -16,6 +17,7 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --link: #60a5fa;
   }
 }
 
@@ -23,4 +25,14 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans), sans-serif;
+}
+
+a {
+  color: var(--link);
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+a:hover {
+  opacity: 0.8;
 }

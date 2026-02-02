@@ -9,34 +9,34 @@ export default function Home() {
 
   return (
     <>
-      <header className="sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">
-        Spot
-        {user && <UserMenu user={user} onSignOut={signOut} />}
+      <header className="sticky top-0 z-10 bg-background px-6 py-3 border-b border-slate-200 dark:border-slate-800 ">
+        <div className="h-8.5 mx-auto container flex flex-row justify-between items-center">
+          <span className="text-xl font-semibold">Spot</span>
+          {user && <UserMenu user={user} onSignOut={signOut} />}
+        </div>
       </header>
-      <main className="p-8 flex flex-col gap-8">
-        <h1 className="text-4xl font-bold text-center">Spot</h1>
-        <Authenticated>
-          <Content />
-        </Authenticated>
-        <Unauthenticated>
-          <SignInForm />
-        </Unauthenticated>
-      </main>
+      <Authenticated>
+        <Content />
+      </Authenticated>
+      <Unauthenticated>
+        <SignInForm />
+      </Unauthenticated>
     </>
   );
 }
 
 function SignInForm() {
   return (
-    <div className="flex flex-col gap-8 w-96 mx-auto">
-      <p>Log in to continue</p>
-      <a href="/sign-in">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">Sign in</button>
-      </a>
-      <a href="/sign-up">
-        <button className="bg-foreground text-background px-4 py-2 rounded-md">Sign up</button>
-      </a>
-    </div>
+    <main className="p-8 flex flex-col justify-center items-center gap-8 min-h-[calc(100vh-60px)]">
+      <div className="p-12 rounded-xl border-2 text-center">
+        <h1 className="text-4xl mb-4 font-bold text-center">Spot</h1>
+        <p className="sm:text-lg whitespace-nowrap">
+          <a href="/sign-in">Log in </a>
+          or <a href="/sign-up">Sign up </a>
+          to continue!
+        </p>
+      </div>
+    </main>
   );
 }
 
@@ -48,19 +48,23 @@ function Content() {
   }
 
   return (
-    <div className="flex flex-col gap-8 max-w-lg mx-auto">
+    <main className="container mx-auto p-8 flex flex-col justify-center items-center gap-8 min-h-[calc(100vh-59px)]">
       <p className="text-center">{user.email}</p>
-    </div>
+      <p>Hello how are you today?</p>
+    </main>
   );
 }
 
 function UserMenu({ user, onSignOut }: { user: User; onSignOut: () => void }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm">
+    <div className="flex items-center gap-4">
+      <span>
         {user.firstName} {user.lastName}
       </span>
-      <button onClick={onSignOut} className="bg-red-500 text-white px-3 py-1 rounded-md text-sm hover:bg-red-600">
+      <button
+        onClick={onSignOut}
+        className="border border-slate-300 dark:border-slate-700 px-3 py-1 rounded-md hover:bg-slate-50 dark:hover:bg-slate-900"
+      >
         Sign out
       </button>
     </div>
