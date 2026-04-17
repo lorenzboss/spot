@@ -1,5 +1,7 @@
 'use client';
 
+import { api } from '@/convex/_generated/api';
+import { useMutation } from 'convex/react';
 import { Gamepad, RefreshCw, Trophy } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 
@@ -87,6 +89,10 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [attempts, setAttempts] = useState(0);
   const [time, setTime] = useState(0);
   const [isGameActive, setIsGameActive] = useState(false);
+  const [scoreSaved, setScoreSaved] = useState(false);
+
+  // Convex hooks
+  const saveGameScore = useMutation(api.myFunctions.saveGameScore);
 
   // Initialize game
   const shuffleCards = () => {
@@ -114,6 +120,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
     setAttempts(0);
     setTime(0);
     setIsGameActive(false);
+    setScoreSaved(false);
   };
 
   // Reset turn
@@ -173,6 +180,20 @@ export default function MemoryGame({ title, description }: { title?: string; des
       }, 500);
     }
   }, [cards]);
+
+  // Save score when game is won
+  useEffect(() => {
+    if (isWon && !scoreSaved && attempts > 0) {
+      const accuracy = Math.round((matches / attempts) * 100);
+      saveGameScore({ turns, time, accuracy })
+        .then(() => {
+          setScoreSaved(true);
+        })
+        .catch((error) => {
+          console.error('Failed to save score:', error);
+        });
+    }
+  }, [isWon, scoreSaved, turns, time, matches, attempts, saveGameScore]);
 
   // Timer logic
   useEffect(() => {
@@ -264,13 +285,6 @@ export default function MemoryGame({ title, description }: { title?: string; des
             disabled={disabled}
           />
         ))}
-      </div>
-
-      {/* Footer Info */}
-      <div className="mt-4 text-center text-sm opacity-60 sm:mt-6 dark:text-slate-400">
-        <p>
-          Made by <a href="https://lorenzboss.com">Lorenz Boss</a> | &copy; {new Date().getFullYear()}
-        </p>
       </div>
 
       {/* Win Modal Overlay */}
