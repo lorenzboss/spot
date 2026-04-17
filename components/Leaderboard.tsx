@@ -52,7 +52,8 @@ export default function Leaderboard() {
                   {score.username ?? 'Anonymous'}
                 </div>
                 <div className="text-sm text-slate-500 dark:text-slate-400">
-                  {score.turns} turns · {Math.floor(score.time / 60)}:{(score.time % 60).toString().padStart(2, '0')}
+                  {score.turns} turns · {Math.floor(score.time / 60)}:{(score.time % 60).toString().padStart(2, '0')} ·{' '}
+                  {score.accuracy}% acc
                 </div>
               </div>
             </div>

@@ -3,12 +3,28 @@
 import { api } from '@/convex/_generated/api';
 import { useMutation } from 'convex/react';
 import { Gamepad, RefreshCw, Trophy } from 'lucide-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 interface CardData {
   id: number;
   src: string;
   matched: boolean;
+}
+
+interface TurnLogEntry {
+  turn: number;
+  pairId: string;
+  isMatch: boolean;
+  wasKnowable: boolean;
+  countsInAccuracy: boolean;
+  isCorrect: boolean;
+  reason:
+    | 'known match'
+    | 'lucky match'
+    | 'missed known partner'
+    | 'chose known non-matching card'
+    | 'ignored known pair'
+    | 'exploration';
 }
 
 interface CardProps {
@@ -87,6 +103,16 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [isWon, setIsWon] = useState(false);
   const [matches, setMatches] = useState(0);
   const [attempts, setAttempts] = useState(0);
+  const [turnsLog, setTurnsLog] = useState<TurnLogEntry[]>([]);
+  const [turnFeedback, setTurnFeedback] = useState<{ message: string; type: 'correct' | 'neutral' | 'wrong' } | null>(
+    null,
+  );
+  const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const feedbackKeyRef = useRef(0);
+  // Maps card id → src for all cards physically seen in previous turns
+  const seenCardsRef = useRef<Map<number, string>>(new Map());
+  // Whether a fully-known unmatched pair was available at the start of the current turn
+  const knownPairsAvailableRef = useRef(false);
   const [time, setTime] = useState(0);
   const [isGameActive, setIsGameActive] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
@@ -121,7 +147,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
       labels
         .slice(row * 4, row * 4 + 4)
         .map((n) => String(n).padStart(2))
-        .join(' | '),
+        .join(' '),
     );
     console.log('🃏 Solution:\n' + rows.join('\n'));
 
@@ -133,6 +159,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
     setDisabled(false);
     setMatches(0);
     setAttempts(0);
+    setTurnsLog([]);
+    seenCardsRef.current = new Map();
+    knownPairsAvailableRef.current = false;
+    if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+    setTurnFeedback(null);
     setTime(0);
     setIsGameActive(false);
     setScoreSaved(false);
@@ -158,6 +189,16 @@ export default function MemoryGame({ title, description }: { title?: string; des
       if (!isGameActive) {
         setIsGameActive(true);
       }
+      // Before flipping the first card, check if any fully-known unmatched pair exists.
+      // Group seen card ids by src, ignoring already-matched cards.
+      const srcToSeenIds = new Map<string, number[]>();
+      for (const [id, src] of seenCardsRef.current.entries()) {
+        const cardState = cards.find((c) => c.id === id);
+        if (cardState?.matched) continue;
+        if (!srcToSeenIds.has(src)) srcToSeenIds.set(src, []);
+        srcToSeenIds.get(src)!.push(id);
+      }
+      knownPairsAvailableRef.current = [...srcToSeenIds.values()].some((ids) => ids.length >= 2);
       setChoiceOne(card);
     }
   };
@@ -169,7 +210,65 @@ export default function MemoryGame({ title, description }: { title?: string; des
       setDisabled(true);
       setAttempts((prev) => prev + 1);
 
-      if (choiceOne.src === choiceTwo.src) {
+      const isMatch = choiceOne.src === choiceTwo.src;
+
+      const seen = seenCardsRef.current;
+      // Do we know where the partner of choiceOne is?
+      // (a card with same src seen in a previous turn, different position)
+      const knewPartnerOfOne = [...seen.entries()].some(([id, src]) => src === choiceOne.src && id !== choiceOne.id);
+      // Did the player already know what choiceTwo was (seen it in a previous turn)?
+      const knewChoiceTwo = seen.has(choiceTwo.id);
+      // Was a fully-known unmatched pair available at the start of this turn
+      // (captured when choiceOne was picked) but the player didn't use it?
+      const ignoredKnownPair = knownPairsAvailableRef.current;
+
+      // A turn counts toward accuracy if the player had information that could have
+      // led to a better move. Pure exploration is excluded.
+      const countsInAccuracy = isMatch || knewPartnerOfOne || knewChoiceTwo || ignoredKnownPair;
+      const isCorrect = isMatch;
+
+      // Describe reason for log readability
+      const reason: TurnLogEntry['reason'] = isMatch
+        ? knewPartnerOfOne
+          ? 'known match'
+          : 'lucky match'
+        : knewPartnerOfOne
+          ? 'missed known partner'
+          : knewChoiceTwo
+            ? 'chose known non-matching card'
+            : ignoredKnownPair
+              ? 'ignored known pair'
+              : 'exploration';
+
+      const feedbackMap: Record<TurnLogEntry['reason'], { message: string; type: 'correct' | 'neutral' | 'wrong' }> = {
+        'known match': { message: 'Match, you knew where it was.', type: 'correct' },
+        'lucky match': { message: 'Lucky match!', type: 'correct' },
+        'missed known partner': { message: 'You knew the partner but picked something else.', type: 'wrong' },
+        'chose known non-matching card': { message: "You'd seen that card, it didn't match.", type: 'wrong' },
+        'ignored known pair': { message: 'A known pair was available.', type: 'wrong' },
+        'exploration': { message: 'Both cards new.', type: 'neutral' },
+      };
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      feedbackKeyRef.current += 1;
+      setTurnFeedback(feedbackMap[reason]);
+      feedbackTimerRef.current = setTimeout(() => setTurnFeedback(null), 5000);
+
+      seenCardsRef.current.set(choiceOne.id, choiceOne.src);
+      seenCardsRef.current.set(choiceTwo.id, choiceTwo.src);
+      setTurnsLog((prev) => [
+        ...prev,
+        {
+          turn: prev.length + 1,
+          pairId: `${choiceOne.src.match(/\/([^/]+)\.png/)?.[1]} + ${choiceTwo.src.match(/\/([^/]+)\.png/)?.[1]}`,
+          isMatch,
+          wasKnowable: countsInAccuracy,
+          countsInAccuracy,
+          isCorrect,
+          reason,
+        },
+      ]);
+
+      if (isMatch) {
         setCards((prevCards) => {
           return prevCards.map((card) => {
             if (card.src === choiceOne.src) {
@@ -199,16 +298,18 @@ export default function MemoryGame({ title, description }: { title?: string; des
   // Save score when game is won
   useEffect(() => {
     if (isWon && !scoreSaved && attempts > 0) {
-      const accuracy = Math.round((matches / attempts) * 100);
+      const counted = turnsLog.filter((t) => t.countsInAccuracy);
+      const correct = counted.filter((t) => t.isCorrect).length;
+      const accuracy = counted.length === 0 ? 100 : Math.round((correct / counted.length) * 100);
       saveGameScore({ turns, time, accuracy })
         .then(() => {
           setScoreSaved(true);
         })
-        .catch((error) => {
-          console.error('Failed to save score:', error);
+        .catch(() => {
+          // score save failed silently
         });
     }
-  }, [isWon, scoreSaved, turns, time, matches, attempts, saveGameScore]);
+  }, [isWon, scoreSaved, turns, time, attempts, turnsLog, saveGameScore]);
 
   // Timer logic
   useEffect(() => {
@@ -283,7 +384,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
               Accuracy
             </span>
             <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
-              {attempts === 0 ? '-%' : `${Math.round((matches / attempts) * 100)}%`}
+              {(() => {
+                const c = turnsLog.filter((t) => t.countsInAccuracy);
+                const ok = c.filter((t) => t.isCorrect).length;
+                return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+              })()}
             </span>
           </div>
         </div>
@@ -300,6 +405,24 @@ export default function MemoryGame({ title, description }: { title?: string; des
             disabled={disabled}
           />
         ))}
+      </div>
+
+      {/* Turn Feedback */}
+      <div className="flex h-6 w-full items-center justify-center">
+        {turnFeedback && (
+          <p
+            key={feedbackKeyRef.current}
+            className={`animate-fade-in text-sm font-medium ${
+              turnFeedback.type === 'correct'
+                ? 'text-green-600 dark:text-green-400'
+                : turnFeedback.type === 'wrong'
+                  ? 'text-red-600 dark:text-red-400'
+                  : 'text-slate-500 dark:text-slate-400'
+            }`}
+          >
+            {turnFeedback.message}
+          </p>
+        )}
       </div>
 
       {/* Win Modal Overlay */}
@@ -325,7 +448,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
               <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-700">
                 <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
                 <div className="mt-1 font-bold text-slate-700 dark:text-slate-200">
-                  {Math.round((matches / attempts) * 100)}%
+                  {(() => {
+                    const c = turnsLog.filter((t) => t.countsInAccuracy);
+                    const ok = c.filter((t) => t.isCorrect).length;
+                    return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+                  })()}
                 </div>
               </div>
             </div>
@@ -349,6 +476,13 @@ export default function MemoryGame({ title, description }: { title?: string; des
         }
         .animate-bounce-in {
             animation: bounceIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(-4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease forwards;
         }
       `}</style>
     </div>
