@@ -6,7 +6,14 @@ import { v } from 'convex/values';
 // app will continue to work.
 // The schema provides more precise TypeScript types.
 export default defineSchema({
-  numbers: defineTable({
-    value: v.number(),
-  }),
+  gameScores: defineTable({
+    userId: v.optional(v.string()),
+    playerName: v.optional(v.string()),
+    turns: v.number(),
+    time: v.number(), // in seconds
+    accuracy: v.number(), // percentage (0-100)
+    score: v.number(), // calculated score (higher is better)
+  })
+    .index('by_score', ['score'])
+    .index('by_turns_and_time', ['turns', 'time']),
 });
