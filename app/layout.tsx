@@ -1,3 +1,4 @@
+import BannedGuard from '@/components/BannedGuard';
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
@@ -43,7 +44,9 @@ export default function RootLayout({
           <ConvexClientProvider>
             <div className="flex min-h-screen flex-col">
               <Header />
-              <div className="flex flex-1 flex-col">{children}</div>
+              <BannedGuard>
+                <div className="flex flex-1 flex-col">{children}</div>
+              </BannedGuard>
               <Footer />
             </div>
           </ConvexClientProvider>

@@ -93,6 +93,24 @@ export const getTopScores = query({
   },
 });
 
+// Update the current user's own username
+export const updateUsername = mutation({
+  args: { username: v.string() },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) throw new Error('Not authenticated');
+    const normalized = args.username.trim().toLowerCase();
+    if (!normalized) throw new Error('Username cannot be empty');
+    if (!/^[a-zA-Z0-9-]+$/.test(normalized)) throw new Error('Username contains invalid characters');
+    const existing = await ctx.db
+      .query('users')
+      .withIndex('by_username', (q) => q.eq('username', normalized))
+      .first();
+    if (existing && existing._id !== userId) throw new Error('Username already taken');
+    await ctx.db.patch(userId, { username: normalized });
+  },
+});
+
 export const viewer = query({
   args: {},
   handler: async (ctx) => {

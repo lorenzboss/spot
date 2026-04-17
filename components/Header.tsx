@@ -3,6 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
+import { Settings, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Header() {
@@ -21,6 +22,22 @@ export default function Header() {
             {currentUser?.username && (
               <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{currentUser.username}</span>
             )}
+            {currentUser?.role === 'admin' && (
+              <Link
+                href="/admin"
+                title="Admin Panel"
+                className="rounded-md p-1.5 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/30"
+              >
+                <ShieldCheck className="h-4.5 w-4.5" />
+              </Link>
+            )}
+            <Link
+              href="/settings"
+              title="Settings"
+              className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+            >
+              <Settings className="h-4.5 w-4.5" />
+            </Link>
             <button
               onClick={() => void signOut()}
               className="rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900"

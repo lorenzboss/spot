@@ -342,7 +342,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
             <h1 className="bg-linear-to-r from-indigo-600 to-violet-600 bg-clip-text text-2xl font-bold text-transparent dark:from-indigo-400 dark:to-violet-400">
               {title}
             </h1>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{description}</p>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
           </div>
 
           <button
