@@ -3,28 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "homepage": "https://github.com/workos/template-convex-nextjs-authkit/#readme",
-  "convex-authkit-auto-provisioning": true,
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/workos/template-convex-nextjs-authkit.git"
-  },
-  "bugs": {
-    "url": "https://github.com/workos/template-convex-nextjs-authkit/issues"
-  },
   "scripts": {
     "dev": "npm-run-all --parallel dev:frontend dev:backend",
     "dev:frontend": "next dev",
     "dev:backend": "convex dev",
-    "predev": "convex dev --until-success && convex dashboard",
+    "predev": "convex dev --until-success",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@auth/core": "^0.37.4",
+    "@convex-dev/auth": "^0.0.91",
     "@convex-dev/eslint-plugin": "^1.1.1",
-    "@workos-inc/authkit-nextjs": "^2.13.0",
     "convex": "^1.31.6",
     "lucide-react": "^0.563.0",
     "next": "^16.1.4",

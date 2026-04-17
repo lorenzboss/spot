@@ -1,17 +1,12 @@
-import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
+import { convexAuthNextjsMiddleware, createRouteMatcher } from '@convex-dev/auth/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export default authkitMiddleware({
-  eagerAuth: true,
-  middlewareAuth: {
-    enabled: true,
-    unauthenticatedPaths: ['/', '/sign-in', '/sign-up'],
-  },
-  redirectUri:
-    process.env.VERCEL_ENV === 'preview'
-      ? `https://${process.env.VERCEL_BRANCH_URL}/callback`
-      : process.env.VERCEL_ENV === 'production'
-        ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}/callback`
-        : undefined,
+const isPublicPage = createRouteMatcher(['/', '/sign-in', '/sign-up']);
+
+export default convexAuthNextjsMiddleware(async (request, { convexAuth }) => {
+  if (!isPublicPage(request) && !(await convexAuth.isAuthenticated())) {
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+  }
 });
 
 export const config = {

@@ -49,22 +49,16 @@ export default function Leaderboard() {
               </div>
               <div>
                 <div className="text-base font-semibold text-slate-700 dark:text-slate-200">
-                  {score.playerName || 'Anonymous'}
+                  {score.username ?? 'Anonymous'}
                 </div>
-                <div className="text-sm text-slate-500 dark:text-slate-400">{score.accuracy}% accuracy</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">
+                  {score.turns} turns · {Math.floor(score.time / 60)}:{(score.time % 60).toString().padStart(2, '0')}
+                </div>
               </div>
             </div>
-            <div className="flex gap-4 text-sm">
-              <div className="text-right">
-                <div className="font-bold text-slate-700 dark:text-slate-200">{score.turns}</div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">turns</div>
-              </div>
-              <div className="text-right">
-                <div className="font-bold text-slate-700 dark:text-slate-200">
-                  {Math.floor(score.time / 60)}:{(score.time % 60).toString().padStart(2, '0')}
-                </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400">time</div>
-              </div>
+            <div className="text-right">
+              <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{score.score}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">score</div>
             </div>
           </div>
         ))}

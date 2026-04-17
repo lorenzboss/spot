@@ -1,12 +1,12 @@
 'use client';
 
 import MemoryGame from '@/components/MemoryGame';
-import { useAuth } from '@workos-inc/authkit-nextjs/components';
+import { useConvexAuth } from 'convex/react';
 
 export default function OfflineGamePage() {
-  const { user } = useAuth();
+  const { isAuthenticated } = useConvexAuth();
 
-  if (!user) {
+  if (!isAuthenticated) {
     return null;
   }
 

@@ -110,6 +110,21 @@ export default function MemoryGame({ title, description }: { title?: string; des
     // Create pairs and shuffle
     const shuffledCards = shuffleArray([...cardImages, ...cardImages]).map((card) => ({ ...card, id: Math.random() }));
 
+    // Log solution as 4x4 grid
+    const pairIndex: Record<string, number> = {};
+    let pairCounter = 1;
+    const labels = shuffledCards.map((card) => {
+      if (!(card.src in pairIndex)) pairIndex[card.src] = pairCounter++;
+      return pairIndex[card.src];
+    });
+    const rows = [0, 1, 2, 3].map((row) =>
+      labels
+        .slice(row * 4, row * 4 + 4)
+        .map((n) => String(n).padStart(2))
+        .join(' | '),
+    );
+    console.log('🃏 Solution:\n' + rows.join('\n'));
+
     setChoiceOne(null);
     setChoiceTwo(null);
     setCards(shuffledCards);

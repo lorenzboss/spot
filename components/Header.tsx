@@ -1,11 +1,14 @@
 'use client';
 
-import { useAuth } from '@workos-inc/authkit-nextjs/components';
-import type { User } from '@workos-inc/node';
+import { api } from '@/convex/_generated/api';
+import { useAuthActions } from '@convex-dev/auth/react';
+import { useConvexAuth, useQuery } from 'convex/react';
 import Link from 'next/link';
 
 export default function Header() {
-  const { user, signOut } = useAuth();
+  const { isAuthenticated } = useConvexAuth();
+  const { signOut } = useAuthActions();
+  const currentUser = useQuery(api.myFunctions.getCurrentUser);
 
   return (
     <header className="bg-background sticky top-0 z-10 border-b border-slate-200 px-6 py-3 dark:border-slate-800">
@@ -13,24 +16,20 @@ export default function Header() {
         <Link href="/" className="text-xl font-semibold transition-opacity hover:opacity-80">
           Spot
         </Link>
-        {user && <UserMenu user={user} onSignOut={signOut} />}
+        {isAuthenticated && (
+          <div className="flex items-center gap-3">
+            {currentUser?.username && (
+              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{currentUser.username}</span>
+            )}
+            <button
+              onClick={() => void signOut()}
+              className="rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </header>
-  );
-}
-
-function UserMenu({ user, onSignOut }: { user: User; onSignOut: () => void }) {
-  return (
-    <div className="flex items-center gap-4">
-      <span className="text-sm">
-        {user.firstName} {user.lastName}
-      </span>
-      <button
-        onClick={onSignOut}
-        className="rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900"
-      >
-        Sign out
-      </button>
-    </div>
   );
 }
