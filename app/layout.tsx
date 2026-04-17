@@ -1,4 +1,6 @@
 import { ConvexClientProvider } from '@/components/ConvexClientProvider';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -29,7 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <ConvexClientProvider>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <div className="flex flex-1 flex-col">{children}</div>
+            <Footer />
+          </div>
+        </ConvexClientProvider>
       </body>
     </html>
   );
