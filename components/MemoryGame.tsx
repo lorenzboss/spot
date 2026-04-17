@@ -149,7 +149,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
         .map((n) => String(n).padStart(2))
         .join(' '),
     );
-    console.log('🃏 Solution:\n' + rows.join('\n'));
+    if (process.env.NODE_ENV === 'development') console.log('🃏 Solution:\n' + rows.join('\n'));
 
     setChoiceOne(null);
     setChoiceTwo(null);
