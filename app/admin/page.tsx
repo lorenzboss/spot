@@ -198,7 +198,7 @@ export default function AdminPage() {
         accessorKey: 'gamesPlayed',
         header: 'Games',
         cell: ({ getValue }) => (
-          <span className="font-mono text-sm tabular-nums text-slate-700">{getValue<number>().toLocaleString()}</span>
+          <span className="font-mono text-sm text-slate-700 tabular-nums">{getValue<number>().toLocaleString()}</span>
         ),
         sortingFn: (a, b) => a.original.gamesPlayed - b.original.gamesPlayed,
       },

@@ -75,7 +75,9 @@ export default function UserGamesDialog({ user, gameStats, onClose }: Props) {
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Avg time</div>
-              <div className="mt-1 text-lg font-semibold text-slate-800">{formatTime(gameStats.averages?.time ?? 0)}</div>
+              <div className="mt-1 text-lg font-semibold text-slate-800">
+                {formatTime(gameStats.averages?.time ?? 0)}
+              </div>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
               <div className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Avg accuracy</div>
@@ -101,11 +103,11 @@ export default function UserGamesDialog({ user, gameStats, onClose }: Props) {
                 <tbody>
                   {gameStats.games.map((game, index) => (
                     <tr key={game._id} className="border-t border-slate-100 odd:bg-white even:bg-slate-50/60">
-                      <td className="px-3 py-2 font-mono tabular-nums text-slate-500">{index + 1}</td>
-                      <td className="px-3 py-2 font-mono tabular-nums text-slate-800">{game.score.toLocaleString()}</td>
-                      <td className="px-3 py-2 font-mono tabular-nums text-slate-700">{game.turns}</td>
-                      <td className="px-3 py-2 font-mono tabular-nums text-slate-700">{formatTime(game.time)}</td>
-                      <td className="px-3 py-2 font-mono tabular-nums text-slate-700">{game.accuracy}%</td>
+                      <td className="px-3 py-2 font-mono text-slate-500 tabular-nums">{index + 1}</td>
+                      <td className="px-3 py-2 font-mono text-slate-800 tabular-nums">{game.score.toLocaleString()}</td>
+                      <td className="px-3 py-2 font-mono text-slate-700 tabular-nums">{game.turns}</td>
+                      <td className="px-3 py-2 font-mono text-slate-700 tabular-nums">{formatTime(game.time)}</td>
+                      <td className="px-3 py-2 font-mono text-slate-700 tabular-nums">{game.accuracy}%</td>
                       <td className="px-3 py-2 text-slate-600">{dateFormatter.format(game.playedAt)}</td>
                     </tr>
                   ))}
