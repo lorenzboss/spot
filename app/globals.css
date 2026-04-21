@@ -20,7 +20,7 @@ body {
 
 body {
   min-height: 100dvh;
-  overflow-x: hidden;
+  overflow-x: visible;
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans), sans-serif;
