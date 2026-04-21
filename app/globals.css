@@ -15,14 +15,12 @@
 
 html,
 body {
-  height: 100%;
-  height: 100dvh;
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
+  min-height: 100%;
 }
 
 body {
+  min-height: 100dvh;
+  overflow-x: hidden;
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-geist-sans), sans-serif;

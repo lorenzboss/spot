@@ -171,7 +171,7 @@ export default function AdminPage() {
   if (currentUser?.role !== 'admin') return null;
 
   return (
-    <main className="container mx-auto flex flex-1 flex-col gap-6 overflow-auto p-4 py-8 sm:p-8">
+    <main className="container mx-auto flex flex-1 flex-col gap-6 p-4 py-8 sm:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Admin Panel</h1>
         <span className="text-sm text-slate-500">
