@@ -55,9 +55,7 @@ export default function AdminPage() {
             <span className="flex items-center gap-2 font-medium">
               {row.original.username ?? <span className="text-slate-400 italic">—</span>}
               {isSelf && (
-                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-300">
-                  You
-                </span>
+                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-600">You</span>
               )}
             </span>
           );
@@ -68,7 +66,7 @@ export default function AdminPage() {
         accessorKey: 'email',
         header: 'E-Mail',
         cell: ({ getValue }) => (
-          <span className="text-slate-600 dark:text-slate-400">
+          <span className="text-slate-600">
             {getValue<string | null>() ?? <span className="text-slate-400 italic">—</span>}
           </span>
         ),
@@ -82,9 +80,7 @@ export default function AdminPage() {
           return (
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                role === 'admin'
-                  ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300'
-                  : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'
               }`}
             >
               {role}
@@ -97,11 +93,9 @@ export default function AdminPage() {
         header: 'Status',
         cell: ({ getValue }) =>
           getValue<boolean>() ? (
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/40 dark:text-red-300">
-              Banned
-            </span>
+            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">Banned</span>
           ) : (
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
               Active
             </span>
           ),
@@ -129,7 +123,7 @@ export default function AdminPage() {
             <button
               title="Edit user"
               onClick={() => setEditingUserId(row.original._id)}
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-slate-200"
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
             >
               <Pencil className="h-4 w-4" />
             </button>
@@ -185,22 +179,19 @@ export default function AdminPage() {
         </span>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60"
-                >
+                <tr key={headerGroup.id} className="border-b border-slate-200 bg-slate-50">
                   {headerGroup.headers.map((header) => {
                     const canSort = header.column.getCanSort();
                     const sorted = header.column.getIsSorted();
                     return (
                       <th
                         key={header.id}
-                        className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase dark:text-slate-400 ${canSort ? 'cursor-pointer select-none hover:text-slate-800 dark:hover:text-slate-200' : ''}`}
+                        className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${canSort ? 'cursor-pointer select-none hover:text-slate-800' : ''}`}
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         <span className="inline-flex items-center gap-1">
@@ -240,7 +231,7 @@ export default function AdminPage() {
                 table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className={`border-t border-slate-100 transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800/40 ${row.original.isBanned ? 'opacity-55' : ''}`}
+                    className={`border-t border-slate-100 transition-colors hover:bg-slate-50 ${row.original.isBanned ? 'opacity-55' : ''}`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <td key={cell.id} className="px-4 py-3">

@@ -46,7 +46,7 @@ export default function SignInPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="mb-6 text-center text-2xl font-bold">Sign in</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -60,7 +60,7 @@ export default function SignInPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -74,7 +74,7 @@ export default function SignInPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400"
             />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}

@@ -94,7 +94,7 @@ export default function SignUpPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="mb-6 text-center text-2xl font-bold">Sign up</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
@@ -113,7 +113,7 @@ export default function SignUpPage() {
                 onChange={(e) => {
                   setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
               />
               {!loading && username.trim().length >= 3 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">
@@ -146,7 +146,7 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
               />
               {touched.email && email.length > 0 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">
@@ -187,7 +187,7 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400 dark:border-slate-700 dark:bg-slate-900"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
               />
               {touched.password && password.length > 0 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">

@@ -15,13 +15,13 @@ export default function BannedGuard({ children }: { children: ReactNode }) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
         <ShieldBan className="h-12 w-12 text-red-400" />
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Account Suspended</h1>
-        <p className="max-w-sm text-slate-500 dark:text-slate-400">
+        <h1 className="text-2xl font-bold text-slate-800">Account Suspended</h1>
+        <p className="max-w-sm text-slate-500">
           Your account has been suspended by an administrator. If you believe this is a mistake, please contact support.
         </p>
         <button
           onClick={() => void signOut()}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+          className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
         >
           Sign out
         </button>

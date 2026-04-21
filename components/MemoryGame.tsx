@@ -62,14 +62,14 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
         className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-500 transform-3d ${
           flipped
             ? card.matched
-              ? 'transform-[rotateY(180deg)] border-green-400/90 dark:border-green-600/90'
+              ? 'transform-[rotateY(180deg)] border-green-400/90'
               : 'transform-[rotateY(180deg)] border-indigo-400/90'
-            : 'border-slate-200 hover:border-indigo-300 dark:border-slate-700 dark:hover:border-indigo-500'
+            : 'border-slate-200 hover:border-indigo-300'
         }`}
       >
         {/* Front (Image) - Visible when flipped */}
         <div
-          className={`absolute inset-0 flex transform-[rotateY(180deg)] items-center justify-center overflow-hidden rounded-[10px] bg-white backface-hidden dark:bg-slate-800 ${
+          className={`absolute inset-0 flex transform-[rotateY(180deg)] items-center justify-center overflow-hidden rounded-[10px] bg-white backface-hidden ${
             flipped ? 'opacity-100' : 'opacity-0'
           }`}
         >
@@ -83,11 +83,11 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
 
         {/* Back (Cover) - Visible when not flipped */}
         <div
-          className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden dark:bg-slate-800 ${
+          className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden ${
             !flipped ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <Gamepad className="h-10 w-10 text-slate-300 opacity-50 dark:text-slate-500" />
+          <Gamepad className="h-10 w-10 text-slate-300 opacity-50" />
         </div>
       </div>
     </div>
@@ -335,19 +335,19 @@ export default function MemoryGame({ title, description }: { title?: string; des
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center">
       {/* Header */}
-      <div className="mb-4 flex w-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-2 shadow-sm sm:mb-6 sm:p-4 dark:border-slate-700 dark:bg-slate-800">
+      <div className="mb-4 flex w-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-2 shadow-sm sm:mb-6 sm:p-4">
         {/* Title and New Game Button */}
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h1 className="bg-linear-to-r from-indigo-600 to-violet-600 bg-clip-text text-2xl font-bold text-transparent dark:from-indigo-400 dark:to-violet-400">
+            <h1 className="bg-linear-to-r from-indigo-600 to-violet-600 bg-clip-text text-2xl font-bold text-transparent">
               {title}
             </h1>
-            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>
+            <p className="mt-1 text-sm text-slate-500">{description}</p>
           </div>
 
           <button
             onClick={shuffleCards}
-            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-indigo-50 hover:text-indigo-600 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 dark:hover:text-indigo-400"
+            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-indigo-50 hover:text-indigo-600"
             title="New Game"
           >
             <RefreshCw className="h-5 w-5" />
@@ -356,34 +356,34 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-2 sm:gap-4">
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3 dark:bg-slate-700/50">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs dark:text-slate-500">
+          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
               Time
             </span>
-            <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
+            <span className="text-lg font-bold text-slate-700">
               {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
             </span>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3 dark:bg-slate-700/50">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs dark:text-slate-500">
+          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
               Turns
             </span>
-            <span className="text-lg font-bold text-slate-700 dark:text-slate-200">{turns}</span>
+            <span className="text-lg font-bold text-slate-700">{turns}</span>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3 dark:bg-slate-700/50">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs dark:text-slate-500">
+          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
               Matches
             </span>
-            <span className="text-lg font-bold text-slate-700 dark:text-slate-200">{matches}/8</span>
+            <span className="text-lg font-bold text-slate-700">{matches}/8</span>
           </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3 dark:bg-slate-700/50">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs dark:text-slate-500">
+          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
               Accuracy
             </span>
-            <span className="text-lg font-bold text-slate-700 dark:text-slate-200">
+            <span className="text-lg font-bold text-slate-700">
               {(() => {
                 const c = turnsLog.filter((t) => t.countsInAccuracy);
                 const ok = c.filter((t) => t.isCorrect).length;
@@ -414,10 +414,10 @@ export default function MemoryGame({ title, description }: { title?: string; des
             key={feedbackKeyRef.current}
             className={`animate-fade-in text-sm font-medium ${
               turnFeedback.type === 'correct'
-                ? 'text-green-600 dark:text-green-400'
+                ? 'text-green-600'
                 : turnFeedback.type === 'wrong'
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'text-red-600'
+                  : 'text-slate-500'
             }`}
           >
             {turnFeedback.message}
@@ -428,26 +428,26 @@ export default function MemoryGame({ title, description }: { title?: string; des
       {/* Win Modal Overlay */}
       {isWon && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-          <div className="animate-bounce-in w-full max-w-sm scale-100 transform rounded-3xl bg-white p-8 text-center shadow-xl transition-all dark:bg-slate-800">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500 dark:bg-yellow-900/30">
+          <div className="animate-bounce-in w-full max-w-sm scale-100 transform rounded-3xl bg-white p-8 text-center shadow-xl transition-all">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500">
               <Trophy className="h-10 w-10" />
             </div>
 
-            <h2 className="mb-2 text-3xl font-bold text-slate-800 dark:text-white">You Won!</h2>
-            <p className="mb-4 text-slate-500 dark:text-slate-300">
-              Completed in <span className="font-bold text-indigo-600 dark:text-indigo-400">{turns}</span> turns
+            <h2 className="mb-2 text-3xl font-bold text-slate-800">You Won!</h2>
+            <p className="mb-4 text-slate-500">
+              Completed in <span className="font-bold text-indigo-600">{turns}</span> turns
             </p>
 
             <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-700">
+              <div className="rounded-lg bg-slate-50 p-3">
                 <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
-                <div className="mt-1 font-bold text-slate-700 dark:text-slate-200">
+                <div className="mt-1 font-bold text-slate-700">
                   {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
                 </div>
               </div>
-              <div className="rounded-lg bg-slate-50 p-3 dark:bg-slate-700">
+              <div className="rounded-lg bg-slate-50 p-3">
                 <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
-                <div className="mt-1 font-bold text-slate-700 dark:text-slate-200">
+                <div className="mt-1 font-bold text-slate-700">
                   {(() => {
                     const c = turnsLog.filter((t) => t.countsInAccuracy);
                     const ok = c.filter((t) => t.isCorrect).length;
@@ -459,7 +459,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
             <button
               onClick={shuffleCards}
-              className="w-full rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 active:scale-95 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-600"
+              className="w-full rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 active:scale-95"
             >
               Play Again
             </button>

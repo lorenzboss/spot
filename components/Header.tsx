@@ -12,7 +12,7 @@ export default function Header() {
   const currentUser = useQuery(api.myFunctions.getCurrentUser);
 
   return (
-    <header className="bg-background sticky top-0 z-10 border-b border-slate-200 px-6 py-3 dark:border-slate-800">
+    <header className="bg-background sticky top-0 z-10 border-b border-slate-200 px-6 py-3">
       <div className="container mx-auto flex h-8.5 flex-row items-center justify-between">
         <Link href="/" className="text-xl font-semibold transition-opacity hover:opacity-80">
           Spot
@@ -20,27 +20,19 @@ export default function Header() {
         {isAuthenticated && (
           <div className="flex items-center gap-3">
             {currentUser?.username && (
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">{currentUser.username}</span>
+              <span className="text-sm font-medium text-slate-600">{currentUser.username}</span>
             )}
             {currentUser?.role === 'admin' && (
-              <Link
-                href="/admin"
-                title="Admin Panel"
-                className="rounded-md p-1.5 text-purple-600 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/30"
-              >
+              <Link href="/admin" title="Admin Panel" className="rounded-md p-1.5 text-purple-600 hover:bg-purple-50">
                 <ShieldCheck className="h-4.5 w-4.5" />
               </Link>
             )}
-            <Link
-              href="/settings"
-              title="Settings"
-              className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
-            >
+            <Link href="/settings" title="Settings" className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100">
               <Settings className="h-4.5 w-4.5" />
             </Link>
             <button
               onClick={() => void signOut()}
-              className="rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-900"
+              className="rounded-md border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50"
             >
               Sign out
             </button>

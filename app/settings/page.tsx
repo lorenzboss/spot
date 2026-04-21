@@ -47,13 +47,13 @@ export default function SettingsPage() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
         <ShieldBan className="h-12 w-12 text-red-400" />
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Account Suspended</h1>
-        <p className="max-w-sm text-slate-500 dark:text-slate-400">
+        <h1 className="text-2xl font-bold text-slate-800">Account Suspended</h1>
+        <p className="max-w-sm text-slate-500">
           Your account has been suspended by an administrator. If you believe this is a mistake, please contact support.
         </p>
         <button
           onClick={() => void signOut()}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800"
+          className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
         >
           Sign out
         </button>
@@ -137,11 +137,11 @@ function SettingsForm({
       <div className="w-full max-w-md">
         <h1 className="mb-6 text-2xl font-bold">Settings</h1>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-base font-semibold">Profile</h2>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Username</label>
+              <label className="text-sm font-medium text-slate-700">Username</label>
               <div className="relative">
                 <input
                   type="text"
@@ -153,7 +153,7 @@ function SettingsForm({
                   }}
                   maxLength={20}
                   placeholder="your-username"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none dark:border-slate-600 dark:bg-slate-800"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
                 />
                 {showIcon && (
                   <span className="absolute top-1/2 right-3 -translate-y-1/2">
@@ -197,20 +197,14 @@ function SettingsForm({
           </form>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">Account Info</h2>
           <p className="text-sm text-slate-500">
-            <span className="font-medium text-slate-700 dark:text-slate-300">E-Mail:</span> {currentUser?.email ?? '—'}
+            <span className="font-medium text-slate-700">E-Mail:</span> {currentUser?.email ?? '—'}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            <span className="font-medium text-slate-700 dark:text-slate-300">Role:</span>{' '}
-            <span
-              className={
-                currentUser?.role === 'admin'
-                  ? 'font-semibold text-purple-600 dark:text-purple-400'
-                  : 'text-slate-600 dark:text-slate-400'
-              }
-            >
+            <span className="font-medium text-slate-700">Role:</span>{' '}
+            <span className={currentUser?.role === 'admin' ? 'font-semibold text-purple-600' : 'text-slate-600'}>
               {currentUser?.role ?? 'user'}
             </span>
           </p>

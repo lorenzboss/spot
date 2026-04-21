@@ -22,9 +22,9 @@ export default function Home() {
 function SignInForm() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 overflow-auto p-8">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
         <h1 className="mb-2 text-4xl font-bold tracking-tight">Spot</h1>
-        <p className="mb-8 text-slate-500 dark:text-slate-400">Sign in to start playing</p>
+        <p className="mb-8 text-slate-500">Sign in to start playing</p>
         <div className="flex flex-col gap-3">
           <a
             href="/sign-in"
@@ -34,7 +34,7 @@ function SignInForm() {
           </a>
           <a
             href="/sign-up"
-            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+            className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
           >
             Create account
           </a>
@@ -52,26 +52,26 @@ function Content() {
         {/* Offline Mode */}
         <Link
           href="/play/offline"
-          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-indigo-400 hover:shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:hover:border-indigo-500"
+          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-indigo-400 hover:shadow-sm"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
             <Gamepad2 className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-slate-800 dark:text-white">Offline Mode</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Play solo</p>
+            <h3 className="font-semibold text-slate-800">Offline Mode</h3>
+            <p className="text-xs text-slate-500">Play solo</p>
           </div>
           <span className="text-slate-400 transition-transform group-hover:translate-x-1">→</span>
         </Link>
 
         {/* Online Mode - Coming Soon */}
-        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 opacity-50 dark:border-slate-700 dark:bg-slate-800/50">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-slate-400 dark:bg-slate-700 dark:text-slate-500">
+        <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 opacity-50">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-slate-400">
             <Globe className="h-6 w-6" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-slate-600 dark:text-slate-500">Online Mode</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-600">Coming soon</p>
+            <h3 className="font-semibold text-slate-600">Online Mode</h3>
+            <p className="text-xs text-slate-500">Coming soon</p>
           </div>
           <Lock className="h-4 w-4 text-slate-400" />
         </div>

@@ -141,7 +141,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
               maxLength={20}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none dark:border-slate-600 dark:bg-slate-800"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
             />
             {normalizedUsername.length >= 3 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
@@ -178,7 +178,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none dark:border-slate-600 dark:bg-slate-800"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
             />
             {normalizedEmail.length > 0 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
@@ -214,13 +214,13 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         </button>
 
         {/* Divider */}
-        <hr className="border-slate-200 dark:border-slate-700" />
+        <hr className="border-slate-200" />
 
         {/* Role & Ban toggles */}
         <div className="flex flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Account</p>
           {isSelf && (
-            <p className="rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            <p className="rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-500">
               You cannot ban, revoke or delete your own account.
             </p>
           )}
@@ -231,7 +231,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
                 disabled={isSelf}
                 onClick={() => handleRole('user')}
                 title={isSelf ? 'Cannot change your own role' : 'Revoke admin'}
-                className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50"
+                className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ShieldOff className="h-3.5 w-3.5" />
                 Revoke Admin
@@ -239,7 +239,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
             ) : (
               <button
                 onClick={() => handleRole('admin')}
-                className="flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-900/20 dark:text-purple-300"
+                className="flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-100"
               >
                 <Shield className="h-3.5 w-3.5" />
                 Make Admin
@@ -250,7 +250,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               <button
                 disabled={isSelf}
                 onClick={() => handleBan(false)}
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-emerald-800 dark:bg-emerald-900/20 dark:text-emerald-300"
+                className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <UserCheck className="h-3.5 w-3.5" />
                 Unban User
@@ -260,7 +260,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
                 disabled={isSelf}
                 onClick={() => handleBan(true)}
                 title={isSelf ? 'Cannot ban yourself' : 'Ban user'}
-                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
+                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <UserX className="h-3.5 w-3.5" />
                 Ban User
@@ -273,19 +273,19 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         {/* Danger zone */}
         {!isSelf && (
           <>
-            <hr className="border-slate-200 dark:border-slate-700" />
+            <hr className="border-slate-200" />
             <div className="flex flex-col gap-2">
               <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Danger Zone</p>
               {showDeleteConfirm ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/40">
-                  <div className="mb-3 flex items-start gap-2 text-sm text-red-700 dark:text-red-300">
+                <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+                  <div className="mb-3 flex items-start gap-2 text-sm text-red-700">
                     <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>This permanently deletes the user and all their scores. This cannot be undone.</span>
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowDeleteConfirm(false)}
-                      className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
+                      className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50"
                     >
                       Cancel
                     </button>
@@ -300,7 +300,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               ) : (
                 <button
                   onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-1.5 self-start rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 dark:border-red-800 dark:bg-red-900/20 dark:text-red-300"
+                  className="flex items-center gap-1.5 self-start rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Delete User
