@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { CheckCircle, Loader2, XCircle } from 'lucide-react';
+import { Check, Loader2, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -87,7 +87,7 @@ export default function SignUpPage() {
   if (pendingRedirect) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
       </main>
     );
   }
@@ -113,16 +113,16 @@ export default function SignUpPage() {
                 onChange={(e) => {
                   setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                 }}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-blue-400"
               />
               {!loading && username.trim().length >= 3 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">
                   {usernameAvailable === null ? (
                     <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                   ) : usernameAvailable ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Check className="h-4 w-4 text-green-500" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <X className="h-4 w-4 text-red-500" />
                   )}
                 </span>
               )}
@@ -146,16 +146,16 @@ export default function SignUpPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setTouched((t) => ({ ...t, email: true }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-blue-400"
               />
               {touched.email && email.length > 0 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">
                   {!emailValid ? (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <X className="h-4 w-4 text-red-500" />
                   ) : emailTaken ? (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <X className="h-4 w-4 text-red-500" />
                   ) : (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Check className="h-4 w-4 text-green-500" />
                   )}
                 </span>
               )}
@@ -187,14 +187,14 @@ export default function SignUpPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onBlur={() => setTouched((t) => ({ ...t, password: true }))}
-                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-indigo-400"
+                className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-blue-400"
               />
               {touched.password && password.length > 0 && (
                 <span className="absolute top-1/2 right-3 -translate-y-1/2">
                   {passwordValid ? (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <Check className="h-4 w-4 text-green-500" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-red-500" />
+                    <X className="h-4 w-4 text-red-500" />
                   )}
                 </span>
               )}
@@ -209,14 +209,14 @@ export default function SignUpPage() {
           <button
             type="submit"
             disabled={loading || usernameAvailable === false || emailTaken}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-500">
           Already have an account?{' '}
-          <a href="/sign-in" className="text-indigo-600 hover:underline">
+          <a href="/sign-in" className="text-blue-600 hover:underline">
             Sign in
           </a>
         </p>

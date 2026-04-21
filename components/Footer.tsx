@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="container mx-auto text-center text-sm text-slate-600">
         <p>
           Made by{' '}
-          <a href="https://lorenzboss.com" className="transition-colors hover:text-indigo-600">
+          <a href="https://lorenzboss.com" className="transition-colors hover:text-blue-600">
             Lorenz Boss
           </a>{' '}
           | &copy; {new Date().getFullYear()}

@@ -25,7 +25,7 @@ export default function SignInPage() {
   if (pendingRedirect) {
     return (
       <main className="flex flex-1 flex-col items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
       </main>
     );
   }
@@ -60,7 +60,7 @@ export default function SignInPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
             />
           </div>
           <div className="flex flex-col gap-1">
@@ -74,21 +74,21 @@ export default function SignInPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-400"
+              className="rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
             />
           </div>
           {error && <p className="text-sm text-red-500">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-500">
           No account?{' '}
-          <a href="/sign-up" className="text-indigo-600 hover:underline">
+          <a href="/sign-up" className="text-blue-600 hover:underline">
             Sign up
           </a>
         </p>

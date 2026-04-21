@@ -3,17 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import { useMutation, useQuery } from 'convex/react';
-import {
-  CheckCircle,
-  Loader2,
-  Shield,
-  ShieldOff,
-  Trash2,
-  TriangleAlert,
-  UserCheck,
-  UserX,
-  XCircle,
-} from 'lucide-react';
+import { Check, Loader2, Shield, ShieldOff, Trash2, TriangleAlert, UserCheck, UserX, X } from 'lucide-react';
 import { useState } from 'react';
 import Dialog from './Dialog';
 
@@ -141,18 +131,18 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
               maxLength={20}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
             {normalizedUsername.length >= 3 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
                 {usernameChecking ? (
                   <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                 ) : !usernameFormatValid ? (
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-red-500" />
                 ) : usernameAvailable === true ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <Check className="h-4 w-4 text-green-500" />
                 ) : usernameAvailable === false ? (
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-red-500" />
                 ) : null}
               </span>
             )}
@@ -178,18 +168,18 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
             {normalizedEmail.length > 0 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
                 {emailChecking ? (
                   <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                 ) : !emailFormatValid ? (
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-red-500" />
                 ) : emailTaken ? (
-                  <XCircle className="h-4 w-4 text-red-500" />
+                  <X className="h-4 w-4 text-red-500" />
                 ) : emailTaken === false ? (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
+                  <Check className="h-4 w-4 text-green-500" />
                 ) : null}
               </span>
             )}
@@ -208,7 +198,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         <button
           onClick={handleSave}
           disabled={!canSave}
-          className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
@@ -239,7 +229,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
             ) : (
               <button
                 onClick={() => handleRole('admin')}
-                className="flex items-center gap-1.5 rounded-lg border border-purple-200 bg-purple-50 px-3 py-1.5 text-xs font-medium text-purple-700 transition-colors hover:bg-purple-100"
+                className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
               >
                 <Shield className="h-3.5 w-3.5" />
                 Make Admin

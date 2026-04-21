@@ -55,7 +55,7 @@ export default function AdminPage() {
             <span className="flex items-center gap-2 font-medium">
               {row.original.username ?? <span className="text-slate-400 italic">—</span>}
               {isSelf && (
-                <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-600">You</span>
+                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">You</span>
               )}
             </span>
           );
@@ -80,7 +80,7 @@ export default function AdminPage() {
           return (
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-600'
+                role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
               }`}
             >
               {role}

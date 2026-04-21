@@ -23,7 +23,7 @@ export default function Header() {
               <span className="text-sm font-medium text-slate-600">{currentUser.username}</span>
             )}
             {currentUser?.role === 'admin' && (
-              <Link href="/admin" title="Admin Panel" className="rounded-md p-1.5 text-purple-600 hover:bg-purple-50">
+              <Link href="/admin" title="Admin Panel" className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50">
                 <ShieldCheck className="h-4.5 w-4.5" />
               </Link>
             )}

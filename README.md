@@ -66,7 +66,7 @@ $$\text{score} = \frac{10{,}000{,}000}{\text{turns}^{1.5} \cdot \sqrt{\text{time
 | ---------- | --------------------------------------------------- |
 | `turns`    | Total number of card pairs flipped during the game  |
 | `time`     | Time in seconds from first card flip to last match  |
-| `accuracy` | Percentage of smart turns that were correct (0–100) |
+| `accuracy` | Percentage of smart turns that were correct (0-100) |
 
 ---
 
@@ -78,7 +78,7 @@ $$\text{score} = \frac{10{,}000{,}000}{\text{turns}^{1.5} \cdot \sqrt{\text{time
 
 **Accuracy** uses exponent `1.5`. A linear multiplier (`k=1`) would make every percentage point of accuracy equally impactful. With `k=1.5`, the difference between 90% and 100% is larger than the difference between 50% and 60% — rewarding near-perfect play. A single mistake at 89% accuracy reduces the score by ~16%, which is noticeable but not devastating.
 
-The base constant `10,000,000` is chosen so that a solid but not exceptional game (around 14 turns, 90 seconds, 85% accuracy) produces a score roughly in the range of 5,000–15,000, which feels meaningful as a leaderboard number.
+The base constant `10,000,000` is chosen so that a solid but not exceptional game (around 14 turns, 90 seconds, 85% accuracy) produces a score roughly in the range of 5,000-15,000, which feels meaningful as a leaderboard number.
 
 ---
 

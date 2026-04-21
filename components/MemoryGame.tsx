@@ -63,8 +63,8 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
           flipped
             ? card.matched
               ? 'transform-[rotateY(180deg)] border-green-400/90'
-              : 'transform-[rotateY(180deg)] border-indigo-400/90'
-            : 'border-slate-200 hover:border-indigo-300'
+              : 'transform-[rotateY(180deg)] border-blue-400/90'
+            : 'border-slate-200 hover:border-blue-300'
         }`}
       >
         {/* Front (Image) - Visible when flipped */}
@@ -339,7 +339,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
         {/* Title and New Game Button */}
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <h1 className="bg-linear-to-r from-indigo-600 to-violet-600 bg-clip-text text-2xl font-bold text-transparent">
+            <h1 className="bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-2xl font-bold text-transparent">
               {title}
             </h1>
             <p className="mt-1 text-sm text-slate-500">{description}</p>
@@ -347,7 +347,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
           <button
             onClick={shuffleCards}
-            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-indigo-50 hover:text-indigo-600"
+            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
             title="New Game"
           >
             <RefreshCw className="h-5 w-5" />
@@ -435,7 +435,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
             <h2 className="mb-2 text-3xl font-bold text-slate-800">You Won!</h2>
             <p className="mb-4 text-slate-500">
-              Completed in <span className="font-bold text-indigo-600">{turns}</span> turns
+              Completed in <span className="font-bold text-blue-600">{turns}</span> turns
             </p>
 
             <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
@@ -459,7 +459,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
             <button
               onClick={shuffleCards}
-              className="w-full rounded-xl bg-indigo-600 py-4 font-semibold text-white shadow-lg shadow-indigo-200 transition-all hover:bg-indigo-700 active:scale-95"
+              className="w-full rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
             >
               Play Again
             </button>

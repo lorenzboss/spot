@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useMutation, useQuery } from 'convex/react';
-import { CheckCircle, Loader2, ShieldBan, XCircle } from 'lucide-react';
+import { Check, Loader2, ShieldBan, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -153,18 +153,18 @@ function SettingsForm({
                   }}
                   maxLength={20}
                   placeholder="your-username"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 focus:outline-none"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
                 />
                 {showIcon && (
                   <span className="absolute top-1/2 right-3 -translate-y-1/2">
                     {isCheckingAvailability ? (
                       <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
                     ) : !isFormatValid ? (
-                      <XCircle className="h-4 w-4 text-red-500" />
+                      <X className="h-4 w-4 text-red-500" />
                     ) : available === true ? (
-                      <CheckCircle className="h-4 w-4 text-green-500" />
+                      <Check className="h-4 w-4 text-green-500" />
                     ) : available === false ? (
-                      <XCircle className="h-4 w-4 text-red-500" />
+                      <X className="h-4 w-4 text-red-500" />
                     ) : null}
                   </span>
                 )}
@@ -180,7 +180,7 @@ function SettingsForm({
                       : 'Only letters, numbers and hyphens allowed'}
                 </p>
               ) : (
-                <p className="text-xs text-slate-400">3–20 characters · letters, numbers and hyphens</p>
+                <p className="text-xs text-slate-400">3-20 characters · letters, numbers and hyphens</p>
               )}
             </div>
 
@@ -190,7 +190,7 @@ function SettingsForm({
             <button
               type="submit"
               disabled={!canSave}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
@@ -204,7 +204,7 @@ function SettingsForm({
           </p>
           <p className="mt-1 text-sm text-slate-500">
             <span className="font-medium text-slate-700">Role:</span>{' '}
-            <span className={currentUser?.role === 'admin' ? 'font-semibold text-purple-600' : 'text-slate-600'}>
+            <span className={currentUser?.role === 'admin' ? 'font-semibold text-blue-600' : 'text-slate-600'}>
               {currentUser?.role ?? 'user'}
             </span>
           </p>

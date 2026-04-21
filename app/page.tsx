@@ -28,7 +28,7 @@ function SignInForm() {
         <div className="flex flex-col gap-3">
           <a
             href="/sign-in"
-            className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white! transition-colors hover:bg-indigo-700"
+            className="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white! transition-colors hover:bg-blue-700"
           >
             Sign in
           </a>
@@ -52,9 +52,9 @@ function Content() {
         {/* Offline Mode */}
         <Link
           href="/play/offline"
-          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-indigo-400 hover:shadow-sm"
+          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-all hover:border-blue-400 hover:shadow-sm"
         >
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
             <Gamepad2 className="h-6 w-6" />
           </div>
           <div className="flex-1">

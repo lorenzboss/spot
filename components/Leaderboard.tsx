@@ -51,7 +51,7 @@ export default function Leaderboard() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-lg font-bold text-indigo-600">{score.score}</div>
+              <div className="text-lg font-bold text-blue-600">{score.score}</div>
               <div className="text-xs text-slate-500">score</div>
             </div>
           </div>
