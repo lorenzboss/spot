@@ -16,22 +16,22 @@ export default function SettingsPage() {
   const currentUser = useQuery(api.myFunctions.getCurrentUser);
   const updateUsername = useMutation(api.myFunctions.updateUsername);
 
-  const [username, setUsername] = useState('');
+  const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [saveError, setSaveError] = useState('');
+  const username = usernameDraft ?? currentUser?.username ?? '';
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace('/');
+  }
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace('/sign-in');
     }
   }, [isAuthenticated, isLoading, router]);
-
-  useEffect(() => {
-    if (currentUser?.username !== undefined) {
-      setUsername(currentUser.username ?? '');
-    }
-  }, [currentUser?.username]);
 
   if (isLoading || currentUser === undefined) {
     return (
@@ -52,7 +52,7 @@ export default function SettingsPage() {
           Your account has been suspended by an administrator. If you believe this is a mistake, please contact support.
         </p>
         <button
-          onClick={() => void signOut()}
+          onClick={() => void handleSignOut()}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
         >
           Sign out
@@ -65,7 +65,7 @@ export default function SettingsPage() {
     <SettingsForm
       currentUser={currentUser}
       username={username}
-      setUsername={setUsername}
+      setUsername={(value) => setUsernameDraft(value)}
       saving={saving}
       setSaving={setSaving}
       saveStatus={saveStatus}

@@ -50,7 +50,8 @@ export default function AdminPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
   const currentUser = useQuery(api.myFunctions.getCurrentUser);
-  const users = useQuery(api.admin.listAllUsers);
+  const isAdmin = isAuthenticated && currentUser?.role === 'admin';
+  const users = useQuery(api.admin.listAllUsers, isAdmin ? {} : 'skip');
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: 'isBanned', desc: false },
@@ -64,7 +65,7 @@ export default function AdminPage() {
 
   const loadedGameStats = useQuery(
     api.admin.getUserGameStats,
-    loadingGamesUserId ? { userId: loadingGamesUserId } : 'skip',
+    isAdmin && loadingGamesUserId ? { userId: loadingGamesUserId } : 'skip',
   );
 
   useEffect(() => {
@@ -89,7 +90,8 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || (currentUser !== undefined && currentUser?.role !== 'admin'))) {
+    if (isLoading || currentUser === undefined) return;
+    if (!isAuthenticated || !currentUser || currentUser.role !== 'admin') {
       router.replace('/');
     }
   }, [isAuthenticated, isLoading, currentUser, router]);
@@ -242,7 +244,7 @@ export default function AdminPage() {
     );
   }
 
-  if (currentUser?.role !== 'admin') return null;
+  if (!isAuthenticated || !currentUser || currentUser.role !== 'admin') return null;
 
   return (
     <main className="mx-auto flex flex-1 flex-col gap-6 p-4 py-8 sm:p-8">

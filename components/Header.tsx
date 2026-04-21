@@ -5,6 +5,7 @@ import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
 import { LogOut, Settings, UsersRound } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 const TEN_MINUTES_MS = 10 * 60 * 1000;
@@ -36,8 +37,14 @@ function getGreetingByLocalTime(date: Date) {
 export default function Header() {
   const { isAuthenticated } = useConvexAuth();
   const { signOut } = useAuthActions();
+  const router = useRouter();
   const currentUser = useQuery(api.myFunctions.getCurrentUser);
   const [greetingTemplate] = useState(() => getGreetingByLocalTime(new Date()));
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace('/');
+  }
 
   return (
     <header className="bg-background sticky top-0 z-10 border-b border-slate-200 px-3 py-2">
@@ -69,7 +76,7 @@ export default function Header() {
               <Settings className="h-4.5 w-4.5" />
             </Link>
             <button
-              onClick={() => void signOut()}
+              onClick={() => void handleSignOut()}
               title="Sign out"
               aria-label="Sign out"
               className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"

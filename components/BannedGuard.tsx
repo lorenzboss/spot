@@ -4,12 +4,19 @@ import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
 import { ShieldBan } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { ReactNode } from 'react';
 
 export default function BannedGuard({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useConvexAuth();
   const { signOut } = useAuthActions();
+  const router = useRouter();
   const currentUser = useQuery(api.myFunctions.getCurrentUser);
+
+  async function handleSignOut() {
+    await signOut();
+    router.replace('/');
+  }
 
   if (isAuthenticated && currentUser?.isBanned) {
     return (
@@ -20,7 +27,7 @@ export default function BannedGuard({ children }: { children: ReactNode }) {
           Your account has been suspended by an administrator. If you believe this is a mistake, please contact support.
         </p>
         <button
-          onClick={() => void signOut()}
+          onClick={() => void handleSignOut()}
           className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
         >
           Sign out
