@@ -1,6 +1,7 @@
 'use client';
 
 import EditUserDialog from '@/components/EditUserDialog';
+import UserGamesDialog from '@/components/UserGamesDialog';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
 import {
@@ -12,7 +13,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { ArrowUpDown, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
+import { ArrowUpDown, BarChart3, ChevronDown, ChevronUp, Loader2, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -23,6 +24,26 @@ type UserRow = {
   role: string;
   isBanned: boolean;
   highscore: number | null;
+  gamesPlayed: number;
+};
+
+type UserGameStats = {
+  userId: Id<'users'>;
+  totalGames: number;
+  averages: {
+    score: number;
+    turns: number;
+    time: number;
+    accuracy: number;
+  } | null;
+  games: {
+    _id: string;
+    score: number;
+    turns: number;
+    time: number;
+    accuracy: number;
+    playedAt: number;
+  }[];
 };
 
 export default function AdminPage() {
@@ -37,6 +58,35 @@ export default function AdminPage() {
     { id: 'username', desc: false },
   ]);
   const [editingUserId, setEditingUserId] = useState<Id<'users'> | null>(null);
+  const [loadingGamesUserId, setLoadingGamesUserId] = useState<Id<'users'> | null>(null);
+  const [viewingGamesUserId, setViewingGamesUserId] = useState<Id<'users'> | null>(null);
+  const [viewingGameStats, setViewingGameStats] = useState<UserGameStats | null>(null);
+
+  const loadedGameStats = useQuery(
+    api.admin.getUserGameStats,
+    loadingGamesUserId ? { userId: loadingGamesUserId } : 'skip',
+  );
+
+  useEffect(() => {
+    if (!loadingGamesUserId || loadedGameStats === undefined) return;
+    if (loadedGameStats.userId !== loadingGamesUserId) return;
+
+    setViewingGamesUserId(loadingGamesUserId);
+    setViewingGameStats(loadedGameStats);
+    setLoadingGamesUserId(null);
+  }, [loadedGameStats, loadingGamesUserId]);
+
+  function openGamesDialog(userId: Id<'users'>) {
+    setViewingGamesUserId(null);
+    setViewingGameStats(null);
+    setLoadingGamesUserId(userId);
+  }
+
+  function closeGamesDialog() {
+    setViewingGamesUserId(null);
+    setViewingGameStats(null);
+    setLoadingGamesUserId(null);
+  }
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || (currentUser !== undefined && currentUser?.role !== 'admin'))) {
@@ -46,6 +96,36 @@ export default function AdminPage() {
 
   const columns = useMemo<ColumnDef<UserRow>[]>(
     () => [
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Actions</span>,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-start gap-1">
+            <button
+              title="Show games"
+              aria-label={`Show games for ${row.original.username ?? 'user'}`}
+              onClick={() => openGamesDialog(row.original._id)}
+              disabled={loadingGamesUserId !== null}
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            >
+              {loadingGamesUserId === row.original._id ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <BarChart3 className="h-4 w-4" />
+              )}
+            </button>
+            <button
+              title="Edit user"
+              aria-label={`Edit ${row.original.username ?? 'user'}`}
+              onClick={() => setEditingUserId(row.original._id)}
+              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          </div>
+        ),
+      },
       {
         accessorKey: 'username',
         header: 'Username',
@@ -115,20 +195,12 @@ export default function AdminPage() {
         sortingFn: (a, b) => (a.original.highscore ?? -1) - (b.original.highscore ?? -1),
       },
       {
-        id: 'actions',
-        header: () => <span className="sr-only">Actions</span>,
-        enableSorting: false,
-        cell: ({ row }) => (
-          <div className="flex justify-end">
-            <button
-              title="Edit user"
-              onClick={() => setEditingUserId(row.original._id)}
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
-            >
-              <Pencil className="h-4 w-4" />
-            </button>
-          </div>
+        accessorKey: 'gamesPlayed',
+        header: 'Games',
+        cell: ({ getValue }) => (
+          <span className="font-mono text-sm tabular-nums text-slate-700">{getValue<number>().toLocaleString()}</span>
         ),
+        sortingFn: (a, b) => a.original.gamesPlayed - b.original.gamesPlayed,
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,11 +216,13 @@ export default function AdminPage() {
         role: u.role,
         isBanned: u.isBanned,
         highscore: u.highscore,
+        gamesPlayed: u.gamesPlayed ?? 0,
       })),
     [users],
   );
 
   const editingUser = editingUserId ? (tableData.find((u) => u._id === editingUserId) ?? null) : null;
+  const viewingGamesUser = viewingGamesUserId ? (tableData.find((u) => u._id === viewingGamesUserId) ?? null) : null;
 
   const table = useReactTable({
     data: tableData,
@@ -171,7 +245,7 @@ export default function AdminPage() {
   if (currentUser?.role !== 'admin') return null;
 
   return (
-    <main className="container mx-auto flex flex-1 flex-col gap-6 p-4 py-8 sm:p-8">
+    <main className="mx-auto flex flex-1 flex-col gap-6 p-4 py-8 sm:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Admin Panel</h1>
         <span className="text-sm text-slate-500">
@@ -248,6 +322,9 @@ export default function AdminPage() {
 
       {editingUser && currentUser && (
         <EditUserDialog user={editingUser} currentAdminId={currentUser._id} onClose={() => setEditingUserId(null)} />
+      )}
+      {viewingGamesUser && viewingGameStats && (
+        <UserGamesDialog user={viewingGamesUser} gameStats={viewingGameStats} onClose={closeGamesDialog} />
       )}
     </main>
   );

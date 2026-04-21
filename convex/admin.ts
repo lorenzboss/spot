@@ -10,7 +10,7 @@ async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<string> {
   return userId;
 }
 
-// List all users with their best highscore
+// List all users with their best highscore and number of played games
 export const listAllUsers = query({
   args: {},
   handler: async (ctx) => {
@@ -19,8 +19,12 @@ export const listAllUsers = query({
     const allScores = await ctx.db.query('gameScores').collect();
 
     const bestByUser = new Map<string, { score: number; turns: number; time: number; accuracy: number }>();
+    const gamesCountByUser = new Map<string, number>();
     for (const score of allScores) {
       if (!score.userId) continue;
+
+      gamesCountByUser.set(score.userId, (gamesCountByUser.get(score.userId) ?? 0) + 1);
+
       const existing = bestByUser.get(score.userId);
       if (!existing || score.score > existing.score) {
         bestByUser.set(score.userId, {
@@ -39,10 +43,60 @@ export const listAllUsers = query({
       role: user.role ?? 'user',
       isBanned: user.isBanned ?? false,
       highscore: bestByUser.get(user._id)?.score ?? null,
+      gamesPlayed: gamesCountByUser.get(user._id) ?? 0,
       bestTurns: bestByUser.get(user._id)?.turns ?? null,
       bestTime: bestByUser.get(user._id)?.time ?? null,
       bestAccuracy: bestByUser.get(user._id)?.accuracy ?? null,
     }));
+  },
+});
+
+// Get all games for a user including aggregate statistics
+export const getUserGameStats = query({
+  args: { userId: v.id('users') },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const games = await ctx.db
+      .query('gameScores')
+      .filter((q) => q.eq(q.field('userId'), args.userId))
+      .collect();
+
+    const sortedGames = games.sort((a, b) => b._creationTime - a._creationTime);
+    const totalGames = sortedGames.length;
+
+    const totals = sortedGames.reduce(
+      (acc, game) => {
+        acc.score += game.score;
+        acc.turns += game.turns;
+        acc.time += game.time;
+        acc.accuracy += game.accuracy;
+        return acc;
+      },
+      { score: 0, turns: 0, time: 0, accuracy: 0 },
+    );
+
+    return {
+      userId: args.userId,
+      totalGames,
+      averages:
+        totalGames === 0
+          ? null
+          : {
+              score: totals.score / totalGames,
+              turns: totals.turns / totalGames,
+              time: totals.time / totalGames,
+              accuracy: totals.accuracy / totalGames,
+            },
+      games: sortedGames.map((game) => ({
+        _id: game._id,
+        score: game.score,
+        turns: game.turns,
+        time: game.time,
+        accuracy: game.accuracy,
+        playedAt: game._creationTime,
+      })),
+    };
   },
 });
 
