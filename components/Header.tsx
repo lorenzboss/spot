@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { LogOut, Settings, ShieldCheck } from 'lucide-react';
+import { LogOut, Settings, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -46,7 +46,7 @@ export default function Header() {
           Spot
         </Link>
         {isAuthenticated && (
-          <div className="flex items-center sm:gap-3">
+          <div className="flex items-center sm:gap-2">
             {currentUser?.username && (
               <span className="max-w-50 truncate text-sm font-medium text-slate-600 sm:max-w-none">
                 {formatGreeting(greetingTemplate, currentUser.username)}
@@ -58,7 +58,7 @@ export default function Header() {
                 title="Admin Panel"
                 className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
               >
-                <ShieldCheck className="h-4.5 w-4.5" />
+                <UsersRound className="h-4.5 w-4.5" />
               </Link>
             )}
             <Link
