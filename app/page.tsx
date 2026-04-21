@@ -21,7 +21,7 @@ export default function Home() {
 
 function SignInForm() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 overflow-auto p-8">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8">
       <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
         <h1 className="mb-2 text-4xl font-bold tracking-tight">Spot</h1>
         <p className="mb-8 text-slate-500">Sign in to start playing</p>
@@ -46,7 +46,7 @@ function SignInForm() {
 
 function Content() {
   return (
-    <main className="container mx-auto flex flex-1 flex-col items-center justify-start gap-6 overflow-auto p-4 py-8 sm:p-8">
+    <main className="container mx-auto flex flex-1 flex-col items-center justify-start gap-6 p-4 py-8 sm:p-8">
       {/* Game Modes Section */}
       <div className="grid w-full max-w-xl gap-3 sm:grid-cols-2">
         {/* Offline Mode */}
