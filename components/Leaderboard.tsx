@@ -8,6 +8,12 @@ function formatTime(seconds: number) {
   return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
 }
 
+function formatScore(score: number) {
+  return Math.trunc(score)
+    .toString()
+    .replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+}
+
 export default function Leaderboard() {
   const topScores = useQuery(api.myFunctions.getTopScores);
 
@@ -58,7 +64,9 @@ export default function Leaderboard() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-base leading-none font-bold text-blue-600 sm:text-lg">{score.score}</div>
+              <div className="text-base leading-none font-bold text-blue-600 sm:text-lg">
+                {formatScore(score.score)}
+              </div>
               <div className="text-[10px] text-slate-500 sm:text-xs">score</div>
             </div>
           </div>
