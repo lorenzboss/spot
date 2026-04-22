@@ -19,7 +19,7 @@
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "^2.0.1",
-    "convex": "^1.35.1",
+    "convex": "^1.36.0",
     "lucide-react": "^0.563.0",
     "next": "^16.1.4",
     "react": "^19.2.3",
