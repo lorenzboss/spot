@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/convex/_generated/api';
+import { Button, Card, Chip, Input, Spinner } from '@heroui/react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useMutation, useQuery } from 'convex/react';
 import { Check, Loader2, ShieldBan, X } from 'lucide-react';
@@ -36,7 +37,7 @@ export default function SettingsPage() {
   if (isLoading || currentUser === undefined) {
     return (
       <main className="flex flex-1 items-center justify-center">
-        <div className="text-slate-500">Loading…</div>
+        <Spinner />
       </main>
     );
   }
@@ -45,18 +46,20 @@ export default function SettingsPage() {
 
   if (currentUser.isBanned) {
     return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-4 p-8 text-center">
-        <ShieldBan className="h-12 w-12 text-red-400" />
-        <h1 className="text-2xl font-bold text-slate-800">Account Suspended</h1>
-        <p className="max-w-sm text-slate-500">
-          Your account has been suspended by an administrator. If you believe this is a mistake, please contact support.
-        </p>
-        <button
-          onClick={() => void handleSignOut()}
-          className="rounded-lg border border-slate-300 px-4 py-2 text-sm hover:bg-slate-50"
-        >
-          Sign out
-        </button>
+      <main className="flex flex-1 items-center justify-center p-8">
+        <Card className="w-full max-w-md border border-red-100">
+          <Card.Content className="flex flex-col items-center gap-4 p-8 text-center">
+            <ShieldBan className="h-12 w-12 text-red-400" />
+            <h1 className="text-2xl font-bold text-slate-800">Account Suspended</h1>
+            <p className="max-w-sm text-slate-500">
+              Your account has been suspended by an administrator. If you believe this is a mistake, please contact
+              support.
+            </p>
+            <Button variant="outline" onPress={() => void handleSignOut()}>
+              Sign out
+            </Button>
+          </Card.Content>
+        </Card>
       </main>
     );
   }
@@ -137,78 +140,88 @@ function SettingsForm({
       <div className="w-full max-w-md">
         <h1 className="mb-6 text-2xl font-bold">Settings</h1>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-base font-semibold">Profile</h2>
-          <form onSubmit={handleSave} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-slate-700">Username</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-                    setSaveStatus('idle');
-                    setSaveError('');
-                  }}
-                  maxLength={20}
-                  placeholder="your-username"
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
-                />
-                {showIcon && (
-                  <span className="absolute top-1/2 right-3 -translate-y-1/2">
-                    {isCheckingAvailability ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                    ) : !isFormatValid ? (
-                      <X className="h-4 w-4 text-red-500" />
-                    ) : available === true ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : available === false ? (
-                      <X className="h-4 w-4 text-red-500" />
-                    ) : null}
-                  </span>
+        <Card className="border border-slate-200 shadow-sm">
+          <Card.Content className="p-6">
+            <h2 className="mb-4 text-base font-semibold">Profile</h2>
+            <form onSubmit={handleSave} className="flex flex-col gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-slate-700">Username</label>
+                <div className="relative">
+                  <Input
+                    type="text"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                      setSaveStatus('idle');
+                      setSaveError('');
+                    }}
+                    maxLength={20}
+                    placeholder="your-username"
+                    className="pr-9"
+                  />
+                  {showIcon && (
+                    <span className="absolute top-1/2 right-3 -translate-y-1/2">
+                      {isCheckingAvailability ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      ) : !isFormatValid ? (
+                        <X className="h-4 w-4 text-red-500" />
+                      ) : available === true ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : available === false ? (
+                        <X className="h-4 w-4 text-red-500" />
+                      ) : null}
+                    </span>
+                  )}
+                </div>
+                {available === false && !isUnchanged ? (
+                  <p className="text-xs text-red-500">Username already taken</p>
+                ) : normalized.length > 0 && !isFormatValid ? (
+                  <p className="text-xs text-red-500">
+                    {normalized.length < 3
+                      ? 'At least 3 characters required'
+                      : normalized.length > 20
+                        ? 'Maximum 20 characters'
+                        : 'Only letters, numbers and hyphens allowed'}
+                  </p>
+                ) : (
+                  <p className="text-xs text-slate-400">3-20 characters · letters, numbers and hyphens</p>
                 )}
               </div>
-              {available === false && !isUnchanged ? (
-                <p className="text-xs text-red-500">Username already taken</p>
-              ) : normalized.length > 0 && !isFormatValid ? (
-                <p className="text-xs text-red-500">
-                  {normalized.length < 3
-                    ? 'At least 3 characters required'
-                    : normalized.length > 20
-                      ? 'Maximum 20 characters'
-                      : 'Only letters, numbers and hyphens allowed'}
-                </p>
-              ) : (
-                <p className="text-xs text-slate-400">3-20 characters · letters, numbers and hyphens</p>
+
+              {saveStatus === 'error' && <p className="text-sm text-red-600">{saveError}</p>}
+              {saveStatus === 'success' && (
+                <Chip size="sm" variant="soft" className="w-fit bg-green-100 text-green-700">
+                  Username updated!
+                </Chip>
               )}
-            </div>
 
-            {saveStatus === 'error' && <p className="text-sm text-red-600">{saveError}</p>}
-            {saveStatus === 'success' && <p className="text-sm text-green-600">Username updated!</p>}
+              <Button type="submit" isDisabled={!canSave} variant="primary">
+                {saving ? 'Saving…' : 'Save Changes'}
+              </Button>
+            </form>
+          </Card.Content>
+        </Card>
 
-            <button
-              type="submit"
-              disabled={!canSave}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {saving ? 'Saving…' : 'Save Changes'}
-            </button>
-          </form>
-        </div>
-
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-2 text-base font-semibold">Account Info</h2>
-          <p className="text-sm text-slate-500">
-            <span className="font-medium text-slate-700">E-Mail:</span> {currentUser?.email ?? '—'}
-          </p>
-          <p className="mt-1 text-sm text-slate-500">
-            <span className="font-medium text-slate-700">Role:</span>{' '}
-            <span className={currentUser?.role === 'admin' ? 'font-semibold text-blue-600' : 'text-slate-600'}>
-              {currentUser?.role ?? 'user'}
-            </span>
-          </p>
-        </div>
+        <Card className="mt-4 border border-slate-200 shadow-sm">
+          <Card.Content className="p-6">
+            <h2 className="mb-2 text-base font-semibold">Account Info</h2>
+            <p className="text-sm text-slate-500">
+              <span className="font-medium text-slate-700">E-Mail:</span> {currentUser?.email ?? '—'}
+            </p>
+            <p className="mt-1 text-sm text-slate-500">
+              <span className="font-medium text-slate-700">Role:</span>{' '}
+              <Chip
+                size="sm"
+                variant="soft"
+                className={
+                  currentUser?.role === 'admin' ? 'bg-blue-100 font-semibold text-blue-700' : 'bg-slate-100 text-slate-600'
+                }
+              >
+                {currentUser?.role ?? 'user'}
+              </Chip>
+            </p>
+          </Card.Content>
+        </Card>
       </div>
     </main>
   );

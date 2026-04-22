@@ -2,8 +2,9 @@
 
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { Button, Card, Chip, Input, Spinner } from '@heroui/react';
 import { useMutation, useQuery } from 'convex/react';
-import { Check, Loader2, Shield, ShieldOff, Trash2, TriangleAlert, UserCheck, UserX, X } from 'lucide-react';
+import { Check, Shield, ShieldOff, Trash2, TriangleAlert, UserCheck, UserX, X } from 'lucide-react';
 import { useState } from 'react';
 import Dialog from './Dialog';
 
@@ -126,17 +127,17 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium">Username</label>
           <div className="relative">
-            <input
+            <Input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
               maxLength={20}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+              className="pr-9"
             />
             {normalizedUsername.length >= 3 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
                 {usernameChecking ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                  <Spinner size="sm" />
                 ) : !usernameFormatValid ? (
                   <X className="h-4 w-4 text-red-500" />
                 ) : usernameAvailable === true ? (
@@ -164,16 +165,16 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium">E-Mail</label>
           <div className="relative">
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
+              className="pr-9"
             />
             {normalizedEmail.length > 0 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
                 {emailChecking ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                  <Spinner size="sm" />
                 ) : !emailFormatValid ? (
                   <X className="h-4 w-4 text-red-500" />
                 ) : emailTaken ? (
@@ -195,13 +196,9 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
 
         {saveError && <p className="text-sm text-red-600">{saveError}</p>}
 
-        <button
-          onClick={handleSave}
-          disabled={!canSave}
-          className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <Button onPress={handleSave} isDisabled={!canSave} variant="primary">
           {saving ? 'Saving…' : 'Save Changes'}
-        </button>
+        </Button>
 
         {/* Divider */}
         <hr className="border-slate-200" />
@@ -210,51 +207,51 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         <div className="flex flex-col gap-2">
           <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Account</p>
           {isSelf && (
-            <p className="rounded-lg bg-slate-100 px-3 py-2 text-xs text-slate-500">
+            <Chip size="sm" variant="soft" className="w-fit bg-slate-100 px-3 py-2 text-xs text-slate-500">
               You cannot ban, revoke or delete your own account.
-            </p>
+            </Chip>
           )}
           <div className="flex flex-wrap items-center gap-2">
             {/* Role toggle */}
             {user.role === 'admin' ? (
-              <button
-                disabled={isSelf}
-                onClick={() => handleRole('user')}
+              <Button
+                isDisabled={isSelf}
+                onPress={() => handleRole('user')}
                 title={isSelf ? 'Cannot change your own role' : 'Revoke admin'}
-                className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
+                variant="outline"
+                className="text-amber-700"
               >
                 <ShieldOff className="h-3.5 w-3.5" />
                 Revoke Admin
-              </button>
+              </Button>
             ) : (
-              <button
-                onClick={() => handleRole('admin')}
-                className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
-              >
+              <Button onPress={() => handleRole('admin')} variant="outline" className="text-blue-700">
                 <Shield className="h-3.5 w-3.5" />
                 Make Admin
-              </button>
+              </Button>
             )}
             {/* Ban toggle */}
             {user.isBanned ? (
-              <button
-                disabled={isSelf}
-                onClick={() => handleBan(false)}
-                className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+              <Button
+                isDisabled={isSelf}
+                onPress={() => handleBan(false)}
+                variant="outline"
+                className="text-emerald-700"
               >
                 <UserCheck className="h-3.5 w-3.5" />
                 Unban User
-              </button>
+              </Button>
             ) : (
-              <button
-                disabled={isSelf}
-                onClick={() => handleBan(true)}
+              <Button
+                isDisabled={isSelf}
+                onPress={() => handleBan(true)}
                 title={isSelf ? 'Cannot ban yourself' : 'Ban user'}
-                className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
+                variant="outline"
+                className="text-red-700"
               >
                 <UserX className="h-3.5 w-3.5" />
                 Ban User
-              </button>
+              </Button>
             )}
           </div>
           {actionError && <p className="text-xs text-red-600">{actionError}</p>}
@@ -267,34 +264,27 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
             <div className="flex flex-col gap-2">
               <p className="text-xs font-semibold tracking-wide text-slate-400 uppercase">Danger Zone</p>
               {showDeleteConfirm ? (
-                <div className="rounded-xl border border-red-200 bg-red-50 p-3">
+                <Card className="border border-red-200 bg-red-50 shadow-none">
+                  <Card.Content className="p-3">
                   <div className="mb-3 flex items-start gap-2 text-sm text-red-700">
                     <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>This permanently deletes the user and all their scores. This cannot be undone.</span>
                   </div>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => setShowDeleteConfirm(false)}
-                      className="flex-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium hover:bg-slate-50"
-                    >
+                    <Button onPress={() => setShowDeleteConfirm(false)} variant="outline" className="flex-1">
                       Cancel
-                    </button>
-                    <button
-                      onClick={handleDelete}
-                      className="flex-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700"
-                    >
+                    </Button>
+                    <Button onPress={handleDelete} variant="danger" className="flex-1">
                       Yes, delete
-                    </button>
+                    </Button>
                   </div>
-                </div>
+                  </Card.Content>
+                </Card>
               ) : (
-                <button
-                  onClick={() => setShowDeleteConfirm(true)}
-                  className="flex items-center gap-1.5 self-start rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100"
-                >
+                <Button onPress={() => setShowDeleteConfirm(true)} variant="outline" className="self-start text-red-700">
                   <Trash2 className="h-3.5 w-3.5" />
                   Delete User
-                </button>
+                </Button>
               )}
             </div>
           </>

@@ -4,6 +4,7 @@ import EditUserDialog from '@/components/EditUserDialog';
 import UserGamesDialog from '@/components/UserGamesDialog';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { Button, Card, Chip, Spinner } from '@heroui/react';
 import {
   ColumnDef,
   flexRender,
@@ -13,7 +14,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { ArrowUpDown, BarChart3, ChevronDown, ChevronUp, Loader2, Pencil } from 'lucide-react';
+import { ArrowUpDown, BarChart3, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -104,27 +105,31 @@ export default function AdminPage() {
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center justify-start gap-1">
-            <button
+            <Button
+              isIconOnly
+              variant="ghost"
               title="Show games"
               aria-label={`Show games for ${row.original.username ?? 'user'}`}
-              onClick={() => openGamesDialog(row.original._id)}
-              disabled={loadingGamesUserId !== null}
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              onPress={() => openGamesDialog(row.original._id)}
+              isDisabled={loadingGamesUserId !== null}
+              className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             >
               {loadingGamesUserId === row.original._id ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Spinner size="sm" />
               ) : (
                 <BarChart3 className="h-4 w-4" />
               )}
-            </button>
-            <button
+            </Button>
+            <Button
+              isIconOnly
+              variant="ghost"
               title="Edit user"
               aria-label={`Edit ${row.original.username ?? 'user'}`}
-              onClick={() => setEditingUserId(row.original._id)}
-              className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+              onPress={() => setEditingUserId(row.original._id)}
+              className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             >
               <Pencil className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         ),
       },
@@ -137,7 +142,9 @@ export default function AdminPage() {
             <span className="flex items-center gap-2 font-medium">
               {row.original.username ?? <span className="text-slate-400 italic">—</span>}
               {isSelf && (
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">You</span>
+                <Chip size="sm" variant="soft" className="bg-blue-100 text-blue-600">
+                  You
+                </Chip>
               )}
             </span>
           );
@@ -160,13 +167,15 @@ export default function AdminPage() {
         cell: ({ getValue }) => {
           const role = getValue<string>();
           return (
-            <span
+            <Chip
+              size="sm"
+              variant="soft"
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                 role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
               }`}
             >
               {role}
-            </span>
+            </Chip>
           );
         },
       },
@@ -175,11 +184,13 @@ export default function AdminPage() {
         header: 'Status',
         cell: ({ getValue }) =>
           getValue<boolean>() ? (
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">Banned</span>
+            <Chip size="sm" variant="soft" className="bg-red-100 text-red-700">
+              Banned
+            </Chip>
           ) : (
-            <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+            <Chip size="sm" variant="soft" className="bg-emerald-100 text-emerald-700">
               Active
-            </span>
+            </Chip>
           ),
         sortingFn: (a, b) => Number(a.original.isBanned) - Number(b.original.isBanned),
       },
@@ -239,7 +250,7 @@ export default function AdminPage() {
   if (isLoading || currentUser === undefined) {
     return (
       <main className="flex flex-1 items-center justify-center">
-        <div className="text-slate-500">Loading…</div>
+        <Spinner />
       </main>
     );
   }
@@ -250,78 +261,82 @@ export default function AdminPage() {
     <main className="mx-auto flex w-full max-w-4xl min-w-0 flex-1 flex-col gap-6 p-4 py-8 sm:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Admin Panel</h1>
-        <span className="text-sm text-slate-500">
+        <Chip size="sm" variant="soft" className="bg-slate-100 text-slate-600">
           {tableData.length} user{tableData.length !== 1 ? 's' : ''}
-        </span>
+        </Chip>
       </div>
 
-      <div
-        className="min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-2xl border border-slate-200 bg-white shadow-sm"
-        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
-      >
-        <table className="w-max min-w-full text-sm">
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id} className="border-b border-slate-200 bg-slate-50">
-                {headerGroup.headers.map((header) => {
-                  const canSort = header.column.getCanSort();
-                  const sorted = header.column.getIsSorted();
-                  return (
-                    <th
-                      key={header.id}
-                      className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${canSort ? 'cursor-pointer select-none hover:text-slate-800' : ''}`}
-                      onClick={header.column.getToggleSortingHandler()}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        {canSort && (
-                          <span className="text-slate-400">
-                            {sorted === 'asc' ? (
-                              <ChevronUp className="h-3.5 w-3.5" />
-                            ) : sorted === 'desc' ? (
-                              <ChevronDown className="h-3.5 w-3.5" />
-                            ) : (
-                              <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+      <Card className="border border-slate-200 shadow-sm">
+        <Card.Content className="p-0">
+          <div
+            className="min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain"
+            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
+          >
+            <table className="w-max min-w-full text-sm">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id} className="border-b border-slate-200 bg-slate-50">
+                    {headerGroup.headers.map((header) => {
+                      const canSort = header.column.getCanSort();
+                      const sorted = header.column.getIsSorted();
+                      return (
+                        <th
+                          key={header.id}
+                          className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${canSort ? 'cursor-pointer select-none hover:text-slate-800' : ''}`}
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <span className="inline-flex items-center gap-1">
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {canSort && (
+                              <span className="text-slate-400">
+                                {sorted === 'asc' ? (
+                                  <ChevronUp className="h-3.5 w-3.5" />
+                                ) : sorted === 'desc' ? (
+                                  <ChevronDown className="h-3.5 w-3.5" />
+                                ) : (
+                                  <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
+                                )}
+                              </span>
                             )}
                           </span>
-                        )}
-                      </span>
-                    </th>
-                  );
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {users === undefined ? (
-              <tr>
-                <td colSpan={columns.length} className="px-4 py-10 text-center text-slate-400">
-                  Loading…
-                </td>
-              </tr>
-            ) : table.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="px-4 py-10 text-center text-slate-400">
-                  No users found.
-                </td>
-              </tr>
-            ) : (
-              table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className={`border-t border-slate-100 transition-colors hover:bg-slate-50 ${row.original.isBanned ? 'opacity-55' : ''}`}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3 whitespace-nowrap">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {users === undefined ? (
+                  <tr>
+                    <td colSpan={columns.length} className="px-4 py-10 text-center text-slate-400">
+                      Loading…
                     </td>
-                  ))}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </tr>
+                ) : table.getRowModel().rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={columns.length} className="px-4 py-10 text-center text-slate-400">
+                      No users found.
+                    </td>
+                  </tr>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className={`border-t border-slate-100 transition-colors hover:bg-slate-50 ${row.original.isBanned ? 'opacity-55' : ''}`}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="px-4 py-3 whitespace-nowrap">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card.Content>
+      </Card>
 
       {editingUser && currentUser && (
         <EditUserDialog user={editingUser} currentAdminId={currentUser._id} onClose={() => setEditingUserId(null)} />
