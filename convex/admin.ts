@@ -29,9 +29,9 @@ export const listAllUsers = query({
       if (!existing || score.score > existing.score) {
         bestByUser.set(score.userId, {
           score: score.score,
-          turns: score.turns,
+          turns: score.turns ?? 0,
           time: score.time,
-          accuracy: score.accuracy,
+          accuracy: score.accuracy ?? 0,
         });
       }
     }
@@ -65,12 +65,16 @@ export const getUserGameStats = query({
     const sortedGames = games.sort((a, b) => b._creationTime - a._creationTime);
     const totalGames = sortedGames.length;
 
-    const totals = sortedGames.reduce(
+    // Only include classic-mode games in averages
+    const classicGames = sortedGames.filter((g) => g.gameMode === 'classic' || g.gameMode === undefined);
+    const totalClassic = classicGames.length;
+
+    const totals = classicGames.reduce(
       (acc, game) => {
         acc.score += game.score;
-        acc.turns += game.turns;
+        acc.turns += game.turns ?? 0;
         acc.time += game.time;
-        acc.accuracy += game.accuracy;
+        acc.accuracy += game.accuracy ?? 0;
         return acc;
       },
       { score: 0, turns: 0, time: 0, accuracy: 0 },
@@ -80,20 +84,20 @@ export const getUserGameStats = query({
       userId: args.userId,
       totalGames,
       averages:
-        totalGames === 0
+        totalClassic === 0
           ? null
           : {
-              score: totals.score / totalGames,
-              turns: totals.turns / totalGames,
-              time: totals.time / totalGames,
-              accuracy: totals.accuracy / totalGames,
+              score: totals.score / totalClassic,
+              turns: totals.turns / totalClassic,
+              time: totals.time / totalClassic,
+              accuracy: totals.accuracy / totalClassic,
             },
       games: sortedGames.map((game) => ({
         _id: game._id,
         score: game.score,
-        turns: game.turns,
+        turns: game.turns ?? 0,
         time: game.time,
-        accuracy: game.accuracy,
+        accuracy: game.accuracy ?? 0,
         playedAt: game._creationTime,
       })),
     };

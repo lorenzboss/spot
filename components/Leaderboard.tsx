@@ -35,7 +35,7 @@ export default function Leaderboard() {
     <div className="w-full rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
       <div className="mb-3 flex items-center gap-2 sm:mb-4">
         <Medal className="h-5 w-5 text-yellow-500 sm:h-6 sm:w-6" />
-        <h3 className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</h3>
+        <h3 className="text-lg font-bold text-slate-800 sm:text-xl">Classic Memory</h3>
       </div>
       <div className="space-y-1.5 sm:space-y-2">
         {topScores.map((score, index) => (

@@ -15,6 +15,13 @@ interface CardData {
 }
 
 type RevealMode = 'sequential' | 'random';
+type Difficulty = 'easy' | 'medium' | 'hard';
+
+const DIFFICULTY_SHOW_MS: Record<Difficulty, number> = {
+  easy:   3000,
+  medium: 1500,
+  hard:   700,
+};
 
 type GamePhase =
   | 'select'    // choosing sub-mode
@@ -91,8 +98,7 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isWr
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 const TOTAL_PAIRS = 8;
-const CARD_SHOW_MS = 2000;  // how long one card stays visible
-const CARD_GAP_MS = 0;   // dark gap between cards
+const CARD_GAP_MS = 0;
 
 export default function SpeedMemoryGame({ title, description }: { title?: string; description?: string }) {
   const router = useRouter();
@@ -100,6 +106,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   const [cards, setCards] = useState<CardData[]>([]);
   const [phase, setPhase] = useState<GamePhase>('select');
   const [revealMode, setRevealMode] = useState<RevealMode | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
 
   // Index into `revealOrder` currently being shown (-1 = none)
   const [activeRevealCardId, setActiveRevealCardId] = useState<number>(-1);
@@ -149,22 +156,22 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
     return shuffled;
   }, []);
 
-  // ── Start game with chosen mode ──────────────────────────────────────────
+  // ── Start game with chosen mode + difficulty ─────────────────────────────
   const startGame = useCallback(
-    (mode: RevealMode) => {
-      revealGeneration.current += 1; // cancel any running reveal loop
+    (mode: RevealMode, diff: Difficulty) => {
+      revealGeneration.current += 1;
       const newCards = buildCards();
       const order = mode === 'sequential'
         ? newCards.map((c) => c.id)
         : shuffleArray(newCards.map((c) => c.id));
 
-      // Reflect mode in URL
-      router.replace(`?mode=${mode}`, { scroll: false });
+      router.replace(`?mode=${mode}&difficulty=${diff}`, { scroll: false });
 
       setRevealMode(mode);
+      setDifficulty(diff);
       setCards(newCards);
       setRevealOrder(order);
-      setPhase('ready'); // wait for user to press Start before revealing
+      setPhase('ready');
       setActiveRevealCardId(-1);
       setRevealProgress([0, newCards.length]);
       setChoiceOne(null);
@@ -208,8 +215,11 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   // ── Auto-start from URL on first load ───────────────────────────────────
   useEffect(() => {
     const modeParam = searchParams.get('mode');
+    const diffParam = searchParams.get('difficulty');
+    const diff: Difficulty =
+      diffParam === 'medium' ? 'medium' : diffParam === 'hard' ? 'hard' : 'easy';
     if (modeParam === 'sequential' || modeParam === 'random') {
-      startGame(modeParam);
+      startGame(modeParam, diff);
     }
     // Only run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,7 +235,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
         if (revealGeneration.current !== myGeneration) return; // stale – abort
         setRevealProgress([i + 1, revealOrder.length]);
         setActiveRevealCardId(revealOrder[i]);
-        await delay(CARD_SHOW_MS);
+        await delay(DIFFICULTY_SHOW_MS[difficulty]);
         if (revealGeneration.current !== myGeneration) return; // stale – abort
         setActiveRevealCardId(-1);
         if (i < revealOrder.length - 1) await delay(CARD_GAP_MS);
@@ -298,10 +308,15 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   // ── Save score ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (phase !== 'won' || scoreSaved) return;
-    saveGameScore({ turns: TOTAL_PAIRS, time, accuracy: 100 })
+    saveGameScore({
+      time,
+      gameMode: 'speed',
+      difficulty,
+      revealMode: revealMode ?? 'sequential',
+    })
       .then(() => setScoreSaved(true))
       .catch(() => {});
-  }, [phase, scoreSaved, time, saveGameScore]);
+  }, [phase, scoreSaved, time, difficulty, revealMode, saveGameScore]);
 
   // ── Derived flipped state ────────────────────────────────────────────────
   const isFlipped = (card: CardData): boolean => {
@@ -329,12 +344,42 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           </h1>
           <p className="mb-6 text-sm text-slate-500">{description}</p>
 
-          <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">Choose reveal mode</p>
+          {/* Difficulty */}
+          <p className="mb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase">Difficulty</p>
+          <div className="mb-6 flex gap-2">
+            {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
+              const meta = {
+                easy:   { label: 'Easy',   ms: '3s',    color: 'green'  },
+                medium: { label: 'Medium', ms: '1.5s',  color: 'yellow' },
+                hard:   { label: 'Hard',   ms: '0.7s',  color: 'red'    },
+              }[d];
+              const active = difficulty === d;
+              return (
+                <button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  className={`flex flex-1 flex-col items-center rounded-xl border-2 py-3 text-sm font-semibold transition-all active:scale-95 ${
+                    active
+                      ? d === 'easy'
+                        ? 'border-green-400 bg-green-50 text-green-700'
+                        : d === 'medium'
+                          ? 'border-yellow-400 bg-yellow-50 text-yellow-700'
+                          : 'border-red-400 bg-red-50 text-red-700'
+                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                  }`}
+                >
+                  {meta.label}
+                  <span className="mt-0.5 text-[10px] font-normal opacity-70">{meta.ms}/card</span>
+                </button>
+              );
+            })}
+          </div>
 
+          {/* Reveal mode */}
+          <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">Reveal mode</p>
           <div className="flex flex-col gap-3">
-            {/* Sequential */}
             <button
-              onClick={() => startGame('sequential')}
+              onClick={() => startGame('sequential', difficulty)}
               className="group flex items-center gap-4 rounded-xl border-2 border-slate-200 bg-white p-4 text-left transition-all hover:border-violet-400 hover:bg-violet-50 hover:shadow-sm active:scale-[.98]"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600 transition-colors group-hover:bg-violet-200">
@@ -347,9 +392,8 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
               <span className="text-slate-300 transition-transform group-hover:translate-x-1">→</span>
             </button>
 
-            {/* Random */}
             <button
-              onClick={() => startGame('random')}
+              onClick={() => startGame('random', difficulty)}
               className="group flex items-center gap-4 rounded-xl border-2 border-slate-200 bg-white p-4 text-left transition-all hover:border-purple-400 hover:bg-purple-50 hover:shadow-sm active:scale-[.98]"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600 transition-colors group-hover:bg-purple-200">
@@ -392,6 +436,13 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
                 <Shuffle className="h-3.5 w-3.5 text-violet-500" />
               )}
               <span className="text-xs font-medium text-slate-400">{modeLabel} mode</span>
+              <span className={`ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                difficulty === 'easy' ? 'bg-green-100 text-green-700' :
+                difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+              </span>
             </div>
           </div>
           {/* Change mode + Restart buttons */}
@@ -404,7 +455,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
               <Undo2 className="h-5 w-5" />
             </button>
             <button
-              onClick={() => revealMode && startGame(revealMode)}
+              onClick={() => revealMode && startGame(revealMode, difficulty)}
               className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
               title="Restart (same mode)"
             >
@@ -516,7 +567,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => revealMode && startGame(revealMode)}
+                onClick={() => revealMode && startGame(revealMode, difficulty)}
                 className="w-full rounded-xl bg-purple-600 py-3 font-semibold text-white shadow-lg shadow-purple-200 transition-all hover:bg-purple-700 active:scale-95"
               >
                 Play Again (same mode)

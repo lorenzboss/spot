@@ -1,9 +1,11 @@
 'use client';
 
 import Leaderboard from '@/components/Leaderboard';
+import SpeedLeaderboard from '@/components/SpeedLeaderboard';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import { Gamepad2, Globe, Lock, Zap } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function Home() {
   return (
@@ -45,6 +47,8 @@ function SignInForm() {
 }
 
 function Content() {
+  const [activeBoard, setActiveBoard] = useState<'classic' | 'speed'>('classic');
+
   return (
     <main className="container mx-auto flex flex-1 flex-col items-center justify-start gap-4 p-3 py-4 sm:gap-6 sm:p-8">
       {/* Game Modes Section */}
@@ -94,7 +98,38 @@ function Content() {
 
       {/* Leaderboard Section */}
       <div className="w-full max-w-xl">
-        <Leaderboard />
+        {/* Tab toggle */}
+        <div className="mb-3 flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+          <button
+            onClick={() => setActiveBoard('classic')}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
+              activeBoard === 'classic'
+                ? 'bg-white text-slate-800 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Gamepad2 className="h-4 w-4" />
+            Classic
+          </button>
+          <button
+            onClick={() => setActiveBoard('speed')}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
+              activeBoard === 'speed'
+                ? 'bg-white text-slate-800 shadow-sm'
+                : 'text-slate-500 hover:text-slate-700'
+            }`}
+          >
+            <Zap className="h-4 w-4" />
+            Speed Memory
+          </button>
+        </div>
+
+        <div className={activeBoard === 'classic' ? 'block' : 'hidden'}>
+          <Leaderboard />
+        </div>
+        <div className={activeBoard === 'speed' ? 'block' : 'hidden'}>
+          <SpeedLeaderboard />
+        </div>
       </div>
     </main>
   );
