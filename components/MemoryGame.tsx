@@ -341,7 +341,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
         {/* Title and New Game Button */}
         <Card.Header className="flex items-center justify-between px-4 pt-4 sm:px-5 sm:pt-5">
           <div className="flex-1">
-            <Card.Title className="bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-2xl font-bold text-transparent">
+            <Card.Title className="bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-2xl font-bold text-transparent">
               {title}
             </Card.Title>
             <Card.Description className="mt-1 text-sm text-slate-500">{description}</Card.Description>

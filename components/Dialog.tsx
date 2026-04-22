@@ -9,11 +9,12 @@ interface DialogProps {
   onClose: () => void;
   children: ReactNode;
   panelClassName?: string;
+  isOpen?: boolean;
 }
 
-export default function Dialog({ title, onClose, children, panelClassName }: DialogProps) {
+export default function Dialog({ title, onClose, children, panelClassName, isOpen = true }: DialogProps) {
   const state = useOverlayState({
-    isOpen: true,
+    isOpen,
     onOpenChange: (isOpen) => {
       if (!isOpen) onClose();
     },
