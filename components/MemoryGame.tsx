@@ -349,7 +349,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
           <Button
             isIconOnly
-            variant="flat"
+            variant="ghost"
             onPress={shuffleCards}
             className="bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600"
             aria-label="New Game"
@@ -364,7 +364,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
               >
                 Time
@@ -378,7 +378,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
               >
                 Turns
@@ -390,7 +390,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
               >
                 Matches
@@ -402,7 +402,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
               >
                 Accuracy
@@ -438,7 +438,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
           <Chip
             key={feedbackKeyRef.current}
             size="sm"
-            variant="flat"
+            variant="soft"
             className={`animate-fade-in text-sm font-medium ${
               turnFeedback.type === 'correct'
                 ? 'bg-green-100 text-green-600'
@@ -483,7 +483,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
                 </Card.Content>
               </Card>
             </div>
-            <Button color="primary" className="w-full font-semibold" onPress={shuffleCards}>
+            <Button variant="primary" className="w-full font-semibold" onPress={shuffleCards}>
               Play Again
             </Button>
           </div>

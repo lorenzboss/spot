@@ -52,7 +52,7 @@ export default function Leaderboard() {
                 <Table.Cell>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     className={
                       index === 0
                         ? 'bg-yellow-100 text-yellow-700'
