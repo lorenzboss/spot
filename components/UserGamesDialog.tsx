@@ -53,9 +53,7 @@ export default function UserGamesDialog({ user, gameStats, onClose }: Props) {
     <Dialog title={`Games - ${displayName}`} onClose={onClose} panelClassName="max-w-4xl">
       {gameStats.totalGames === 0 ? (
         <Card className="border border-slate-200 bg-slate-50 shadow-none">
-          <Card.Content className="p-4 text-sm text-slate-500">
-          This user has not played any games yet.
-          </Card.Content>
+          <Card.Content className="p-4 text-sm text-slate-500">This user has not played any games yet.</Card.Content>
         </Card>
       ) : (
         <div className="flex flex-col gap-4">
@@ -115,7 +113,9 @@ export default function UserGamesDialog({ user, gameStats, onClose }: Props) {
                   {gameStats.games.map((game, index) => (
                     <Table.Row key={game._id}>
                       <Table.Cell className="font-mono text-slate-500 tabular-nums">{index + 1}</Table.Cell>
-                      <Table.Cell className="font-mono text-slate-800 tabular-nums">{game.score.toLocaleString()}</Table.Cell>
+                      <Table.Cell className="font-mono text-slate-800 tabular-nums">
+                        {game.score.toLocaleString()}
+                      </Table.Cell>
                       <Table.Cell className="font-mono text-slate-700 tabular-nums">{game.turns}</Table.Cell>
                       <Table.Cell className="font-mono text-slate-700 tabular-nums">{formatTime(game.time)}</Table.Cell>
                       <Table.Cell className="font-mono text-slate-700 tabular-nums">{game.accuracy}%</Table.Cell>

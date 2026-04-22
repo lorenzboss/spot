@@ -1,10 +1,11 @@
 'use client';
 
 import Leaderboard from '@/components/Leaderboard';
-import { Button, Card, Chip, Link as HeroLink } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import { Gamepad2, Globe, Lock } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   return (
@@ -21,6 +22,10 @@ export default function Home() {
 }
 
 function SignInForm() {
+  const router = useRouter();
+  const handleGoSignIn = () => router.push('/sign-in');
+  const handleGoSignUp = () => router.push('/sign-up');
+
   return (
     <main className="flex flex-1 flex-col items-center justify-center gap-8 p-8">
       <Card className="w-full max-w-sm border border-slate-200 shadow-sm">
@@ -28,10 +33,10 @@ function SignInForm() {
           <h1 className="mb-2 text-4xl font-bold tracking-tight">Spot</h1>
           <p className="mb-8 text-slate-500">Sign in to start playing</p>
           <div className="flex flex-col gap-3">
-            <Button as={HeroLink} href="/sign-in" variant="primary">
+            <Button variant="primary" onPress={handleGoSignIn}>
               Sign in
             </Button>
-            <Button as={HeroLink} href="/sign-up" variant="outline" className="text-slate-700">
+            <Button variant="outline" className="text-slate-700" onPress={handleGoSignUp}>
               Create account
             </Button>
           </div>

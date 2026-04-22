@@ -64,7 +64,6 @@ export default function Header() {
               <Button
                 isIconOnly
                 variant="ghost"
-                title="Admin Panel"
                 aria-label="Admin Panel"
                 className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
                 onPress={() => router.push('/admin')}
@@ -75,7 +74,6 @@ export default function Header() {
             <Button
               isIconOnly
               variant="ghost"
-              title="Settings"
               aria-label="Settings"
               className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
               onPress={() => router.push('/settings')}
@@ -86,7 +84,6 @@ export default function Header() {
               isIconOnly
               variant="ghost"
               onPress={() => void handleSignOut()}
-              title="Sign out"
               aria-label="Sign out"
               className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
             >

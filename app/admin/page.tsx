@@ -108,22 +108,16 @@ export default function AdminPage() {
             <Button
               isIconOnly
               variant="ghost"
-              title="Show games"
               aria-label={`Show games for ${row.original.username ?? 'user'}`}
               onPress={() => openGamesDialog(row.original._id)}
               isDisabled={loadingGamesUserId !== null}
               className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             >
-              {loadingGamesUserId === row.original._id ? (
-                <Spinner size="sm" />
-              ) : (
-                <BarChart3 className="h-4 w-4" />
-              )}
+              {loadingGamesUserId === row.original._id ? <Spinner size="sm" /> : <BarChart3 className="h-4 w-4" />}
             </Button>
             <Button
               isIconOnly
               variant="ghost"
-              title="Edit user"
               aria-label={`Edit ${row.original.username ?? 'user'}`}
               onPress={() => setEditingUserId(row.original._id)}
               className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"

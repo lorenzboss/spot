@@ -15,8 +15,8 @@ interface DialogProps {
 export default function Dialog({ title, onClose, children, panelClassName, isOpen = true }: DialogProps) {
   const state = useOverlayState({
     isOpen,
-    onOpenChange: (isOpen) => {
-      if (!isOpen) onClose();
+    onOpenChange: (nextOpen) => {
+      if (!nextOpen) onClose();
     },
   });
 

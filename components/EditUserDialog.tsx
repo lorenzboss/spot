@@ -165,12 +165,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
         <div className="flex flex-col gap-1">
           <label className="text-sm font-medium">E-Mail</label>
           <div className="relative">
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pr-9"
-            />
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pr-9" />
             {normalizedEmail.length > 0 && (
               <span className="absolute top-1/2 right-3 -translate-y-1/2">
                 {emailChecking ? (
@@ -217,7 +212,6 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               <Button
                 isDisabled={isSelf}
                 onPress={() => handleRole('user')}
-                title={isSelf ? 'Cannot change your own role' : 'Revoke admin'}
                 variant="outline"
                 className="text-amber-700"
               >
@@ -242,13 +236,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
                 Unban User
               </Button>
             ) : (
-              <Button
-                isDisabled={isSelf}
-                onPress={() => handleBan(true)}
-                title={isSelf ? 'Cannot ban yourself' : 'Ban user'}
-                variant="outline"
-                className="text-red-700"
-              >
+              <Button isDisabled={isSelf} onPress={() => handleBan(true)} variant="outline" className="text-red-700">
                 <UserX className="h-3.5 w-3.5" />
                 Ban User
               </Button>
@@ -266,22 +254,26 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               {showDeleteConfirm ? (
                 <Card className="border border-red-200 bg-red-50 shadow-none">
                   <Card.Content className="p-3">
-                  <div className="mb-3 flex items-start gap-2 text-sm text-red-700">
-                    <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
-                    <span>This permanently deletes the user and all their scores. This cannot be undone.</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button onPress={() => setShowDeleteConfirm(false)} variant="outline" className="flex-1">
-                      Cancel
-                    </Button>
-                    <Button onPress={handleDelete} variant="danger" className="flex-1">
-                      Yes, delete
-                    </Button>
-                  </div>
+                    <div className="mb-3 flex items-start gap-2 text-sm text-red-700">
+                      <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>This permanently deletes the user and all their scores. This cannot be undone.</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button onPress={() => setShowDeleteConfirm(false)} variant="outline" className="flex-1">
+                        Cancel
+                      </Button>
+                      <Button onPress={handleDelete} variant="danger" className="flex-1">
+                        Yes, delete
+                      </Button>
+                    </div>
                   </Card.Content>
                 </Card>
               ) : (
-                <Button onPress={() => setShowDeleteConfirm(true)} variant="outline" className="self-start text-red-700">
+                <Button
+                  onPress={() => setShowDeleteConfirm(true)}
+                  variant="outline"
+                  className="self-start text-red-700"
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                   Delete User
                 </Button>

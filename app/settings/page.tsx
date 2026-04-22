@@ -214,7 +214,9 @@ function SettingsForm({
                 size="sm"
                 variant="soft"
                 className={
-                  currentUser?.role === 'admin' ? 'bg-blue-100 font-semibold text-blue-700' : 'bg-slate-100 text-slate-600'
+                  currentUser?.role === 'admin'
+                    ? 'bg-blue-100 font-semibold text-blue-700'
+                    : 'bg-slate-100 text-slate-600'
                 }
               >
                 {currentUser?.role ?? 'user'}
