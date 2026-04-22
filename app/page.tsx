@@ -2,7 +2,7 @@
 
 import Leaderboard from '@/components/Leaderboard';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
-import { Gamepad2, Globe, Lock } from 'lucide-react';
+import { Gamepad2, Globe, Lock, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 export default function Home() {
@@ -60,6 +60,21 @@ function Content() {
           <div className="flex-1">
             <h3 className="text-sm font-semibold text-slate-800 sm:text-base">Offline Mode</h3>
             <p className="text-[11px] text-slate-500 sm:text-xs">Play solo</p>
+          </div>
+          <span className="text-slate-400 transition-transform group-hover:translate-x-1">→</span>
+        </Link>
+
+        {/* Speed Memory Mode */}
+        <Link
+          href="/play/speed"
+          className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-all hover:border-purple-400 hover:shadow-sm sm:p-4"
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-purple-100 text-purple-600 sm:h-12 sm:w-12">
+            <Zap className="h-5 w-5 sm:h-6 sm:w-6" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-slate-800 sm:text-base">Speed Memory</h3>
+            <p className="text-[11px] text-slate-500 sm:text-xs">No mistakes allowed!</p>
           </div>
           <span className="text-slate-400 transition-transform group-hover:translate-x-1">→</span>
         </Link>
