@@ -1,9 +1,11 @@
 'use client';
 
 import { api } from '@/convex/_generated/api';
+import { Button, Card, Chip } from '@heroui/react';
 import { useMutation } from 'convex/react';
 import { Gamepad, RefreshCw, Trophy } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import Dialog from './Dialog';
 
 interface CardData {
   id: number;
@@ -58,8 +60,8 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
 
   return (
     <div className="group relative aspect-square cursor-pointer perspective-[1000px]" onClick={handleClick}>
-      <div
-        className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-500 transform-3d ${
+      <Card
+        className={`h-full w-full transform border-2 shadow-sm transition-all duration-500 transform-3d ${
           flipped
             ? card.matched
               ? 'transform-[rotateY(180deg)] border-green-400/90'
@@ -83,13 +85,13 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
 
         {/* Back (Cover) - Visible when not flipped */}
         <div
-          className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden ${
+          className={`absolute inset-0 flex items-center justify-center rounded-xl bg-slate-100 transition-colors duration-300 backface-hidden ${
             !flipped ? 'opacity-100' : 'opacity-0'
           }`}
         >
           <Gamepad className="h-10 w-10 text-slate-300 opacity-50" />
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
@@ -335,64 +337,71 @@ export default function MemoryGame({ title, description }: { title?: string; des
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center">
       {/* Header */}
-      <div className="mb-4 flex w-full flex-col gap-4 rounded-2xl border border-slate-100 bg-white p-2 shadow-sm sm:mb-6 sm:p-4">
+      <Card className="mb-4 w-full border border-slate-100 shadow-sm sm:mb-6">
         {/* Title and New Game Button */}
-        <div className="flex items-center justify-between">
+        <Card.Header className="flex items-center justify-between px-4 pt-4 sm:px-5 sm:pt-5">
           <div className="flex-1">
-            <h1 className="bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-2xl font-bold text-transparent">
+            <Card.Title className="bg-linear-to-r from-blue-600 to-blue-500 bg-clip-text text-2xl font-bold text-transparent">
               {title}
-            </h1>
-            <p className="mt-1 text-sm text-slate-500">{description}</p>
+            </Card.Title>
+            <Card.Description className="mt-1 text-sm text-slate-500">{description}</Card.Description>
           </div>
 
-          <button
-            onClick={shuffleCards}
-            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
-            title="New Game"
+          <Button
+            isIconOnly
+            variant="flat"
+            onPress={shuffleCards}
+            className="bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600"
+            aria-label="New Game"
           >
             <RefreshCw className="h-5 w-5" />
-          </button>
-        </div>
+          </Button>
+        </Card.Header>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-4">
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Time
-            </span>
-            <span className="text-lg font-bold text-slate-700">
-              {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
-            </span>
-          </div>
-
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Turns
-            </span>
-            <span className="text-lg font-bold text-slate-700">{turns}</span>
-          </div>
-
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Matches
-            </span>
-            <span className="text-lg font-bold text-slate-700">{matches}/8</span>
-          </div>
-
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Accuracy
-            </span>
-            <span className="text-lg font-bold text-slate-700">
-              {(() => {
-                const c = turnsLog.filter((t) => t.countsInAccuracy);
-                const ok = c.filter((t) => t.isCorrect).length;
-                return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
-              })()}
-            </span>
-          </div>
-        </div>
-      </div>
+        <Card.Content className="grid grid-cols-4 gap-2 px-2 pb-2 sm:gap-4 sm:px-4 sm:pb-4">
+          <Card className="bg-slate-50 shadow-none">
+            <Card.Content className="p-2 pb-1 text-center sm:p-3">
+              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+                Time
+              </Chip>
+              <span className="text-lg font-bold text-slate-700">
+                {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
+              </span>
+            </Card.Content>
+          </Card>
+          <Card className="bg-slate-50 shadow-none">
+            <Card.Content className="p-2 pb-1 text-center sm:p-3">
+              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+                Turns
+              </Chip>
+              <span className="text-lg font-bold text-slate-700">{turns}</span>
+            </Card.Content>
+          </Card>
+          <Card className="bg-slate-50 shadow-none">
+            <Card.Content className="p-2 pb-1 text-center sm:p-3">
+              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+                Matches
+              </Chip>
+              <span className="text-lg font-bold text-slate-700">{matches}/8</span>
+            </Card.Content>
+          </Card>
+          <Card className="bg-slate-50 shadow-none">
+            <Card.Content className="p-2 pb-1 text-center sm:p-3">
+              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+                Accuracy
+              </Chip>
+              <span className="text-lg font-bold text-slate-700">
+                {(() => {
+                  const c = turnsLog.filter((t) => t.countsInAccuracy);
+                  const ok = c.filter((t) => t.isCorrect).length;
+                  return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+                })()}
+              </span>
+            </Card.Content>
+          </Card>
+        </Card.Content>
+      </Card>
 
       {/* Game Grid */}
       <div className="mx-auto grid aspect-square w-full max-w-md grid-cols-4 gap-3 p-2 sm:gap-4">
@@ -410,61 +419,59 @@ export default function MemoryGame({ title, description }: { title?: string; des
       {/* Turn Feedback */}
       <div className="flex h-6 w-full items-center justify-center">
         {turnFeedback && (
-          <p
+          <Chip
             key={feedbackKeyRef.current}
+            size="sm"
+            variant="flat"
             className={`animate-fade-in text-sm font-medium ${
               turnFeedback.type === 'correct'
-                ? 'text-green-600'
+                ? 'bg-green-100 text-green-600'
                 : turnFeedback.type === 'wrong'
-                  ? 'text-red-600'
-                  : 'text-slate-500'
+                  ? 'bg-red-100 text-red-600'
+                  : 'bg-slate-100 text-slate-500'
             }`}
           >
             {turnFeedback.message}
-          </p>
+          </Chip>
         )}
       </div>
 
-      {/* Win Modal Overlay */}
       {isWon && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
-          <div className="animate-bounce-in w-full max-w-sm scale-100 transform rounded-3xl bg-white p-8 text-center shadow-xl transition-all">
+        <Dialog title="You Won!" onClose={shuffleCards}>
+          <div className="animate-bounce-in text-center">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500">
               <Trophy className="h-10 w-10" />
             </div>
-
-            <h2 className="mb-2 text-3xl font-bold text-slate-800">You Won!</h2>
             <p className="mb-4 text-slate-500">
               Completed in <span className="font-bold text-blue-600">{turns}</span> turns
             </p>
-
             <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg bg-slate-50 p-3">
-                <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
-                <div className="mt-1 font-bold text-slate-700">
-                  {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
-                </div>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
-                <div className="mt-1 font-bold text-slate-700">
-                  {(() => {
-                    const c = turnsLog.filter((t) => t.countsInAccuracy);
-                    const ok = c.filter((t) => t.isCorrect).length;
-                    return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
-                  })()}
-                </div>
-              </div>
+              <Card className="bg-slate-50 shadow-none">
+                <Card.Content className="p-3">
+                  <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
+                  <div className="mt-1 font-bold text-slate-700">
+                    {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
+                  </div>
+                </Card.Content>
+              </Card>
+              <Card className="bg-slate-50 shadow-none">
+                <Card.Content className="p-3">
+                  <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
+                  <div className="mt-1 font-bold text-slate-700">
+                    {(() => {
+                      const c = turnsLog.filter((t) => t.countsInAccuracy);
+                      const ok = c.filter((t) => t.isCorrect).length;
+                      return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+                    })()}
+                  </div>
+                </Card.Content>
+              </Card>
             </div>
-
-            <button
-              onClick={shuffleCards}
-              className="w-full rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
-            >
+            <Button color="primary" className="w-full font-semibold" onPress={shuffleCards}>
               Play Again
-            </button>
+            </Button>
           </div>
-        </div>
+        </Dialog>
       )}
 
       {/* CSS Utility for 3D Flip */}

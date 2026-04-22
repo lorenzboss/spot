@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/convex/_generated/api';
+import { Card, Chip, Table } from '@heroui/react';
 import { useQuery } from 'convex/react';
 import { Medal } from 'lucide-react';
 
@@ -19,59 +20,64 @@ export default function Leaderboard() {
 
   if (!topScores || topScores.length === 0) {
     return (
-      <div className="w-full rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-        <div className="mb-3 flex items-center gap-2 sm:mb-4">
+      <Card className="w-full border border-slate-100 shadow-sm">
+        <Card.Header className="mb-1 flex items-center gap-2 px-4 pt-4 sm:px-6 sm:pt-6">
           <Medal className="h-5 w-5 text-yellow-500 sm:h-6 sm:w-6" />
-          <h3 className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</h3>
-        </div>
-        <p className="text-center text-sm text-slate-500 sm:text-base">
+          <Card.Title className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</Card.Title>
+        </Card.Header>
+        <Card.Content className="px-4 pb-4 pt-1 text-center text-sm text-slate-500 sm:px-6 sm:pb-6 sm:text-base">
           No games played yet. Be the first to set a record!
-        </p>
-      </div>
+        </Card.Content>
+      </Card>
     );
   }
 
   return (
-    <div className="w-full rounded-2xl border border-slate-100 bg-white p-4 shadow-sm sm:p-6">
-      <div className="mb-3 flex items-center gap-2 sm:mb-4">
+    <Card className="w-full border border-slate-100 shadow-sm">
+      <Card.Header className="mb-1 flex items-center gap-2 px-4 pt-4 sm:px-6 sm:pt-6">
         <Medal className="h-5 w-5 text-yellow-500 sm:h-6 sm:w-6" />
-        <h3 className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</h3>
-      </div>
-      <div className="space-y-1.5 sm:space-y-2">
-        {topScores.map((score, index) => (
-          <div key={score._id} className="flex items-center justify-between rounded-lg bg-slate-50 px-2.5 py-2 sm:p-4">
-            <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-              <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:h-10 sm:w-10 sm:text-sm ${
-                  index === 0
-                    ? 'bg-yellow-200 text-yellow-700'
-                    : index === 1
-                      ? 'bg-gray-200 text-gray-700'
-                      : index === 2
-                        ? 'bg-orange-200 text-orange-700'
-                        : 'bg-slate-100 text-slate-600'
-                }`}
-              >
-                {index + 1}
-              </div>
-              <div className="min-w-0">
-                <div className="truncate text-sm font-semibold text-slate-700 sm:text-base">
+        <Card.Title className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</Card.Title>
+      </Card.Header>
+      <Card.Content className="px-2 pb-2 pt-1 sm:px-4 sm:pb-4">
+        <Table aria-label="Leaderboard table" className="text-sm">
+          <Table.Header>
+            <Table.Column>#</Table.Column>
+            <Table.Column>PLAYER</Table.Column>
+            <Table.Column>STATS</Table.Column>
+            <Table.Column>SCORE</Table.Column>
+          </Table.Header>
+          <Table.Body>
+            {topScores.map((score, index) => (
+              <Table.Row key={score._id}>
+                <Table.Cell>
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    className={
+                      index === 0
+                        ? 'bg-yellow-100 text-yellow-700'
+                        : index === 1
+                          ? 'bg-slate-200 text-slate-700'
+                          : index === 2
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-slate-100 text-slate-600'
+                    }
+                  >
+                    {index + 1}
+                  </Chip>
+                </Table.Cell>
+                <Table.Cell className="max-w-[140px] truncate font-semibold text-slate-700 sm:max-w-none">
                   {score.username ?? 'Anonymous'}
-                </div>
-                <div className="truncate text-[11px] text-slate-500 sm:text-sm">
+                </Table.Cell>
+                <Table.Cell className="text-[11px] text-slate-500 sm:text-sm">
                   {score.turns} turns · {formatTime(score.time)} · {score.accuracy}% acc
-                </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-base leading-none font-bold text-blue-600 sm:text-lg">
-                {formatScore(score.score)}
-              </div>
-              <div className="text-[10px] text-slate-500 sm:text-xs">score</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                </Table.Cell>
+                <Table.Cell className="font-bold text-blue-600">{formatScore(score.score)}</Table.Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
+      </Card.Content>
+    </Card>
   );
 }
