@@ -25,7 +25,7 @@ export default function Leaderboard() {
           <Medal className="h-5 w-5 text-yellow-500 sm:h-6 sm:w-6" />
           <Card.Title className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</Card.Title>
         </Card.Header>
-        <Card.Content className="px-4 pb-4 pt-1 text-center text-sm text-slate-500 sm:px-6 sm:pb-6 sm:text-base">
+        <Card.Content className="px-4 pt-1 pb-4 text-center text-sm text-slate-500 sm:px-6 sm:pb-6 sm:text-base">
           No games played yet. Be the first to set a record!
         </Card.Content>
       </Card>
@@ -38,7 +38,7 @@ export default function Leaderboard() {
         <Medal className="h-5 w-5 text-yellow-500 sm:h-6 sm:w-6" />
         <Card.Title className="text-lg font-bold text-slate-800 sm:text-xl">Leaderboard</Card.Title>
       </Card.Header>
-      <Card.Content className="px-2 pb-2 pt-1 sm:px-4 sm:pb-4">
+      <Card.Content className="px-2 pt-1 pb-2 sm:px-4 sm:pb-4">
         <Table aria-label="Leaderboard table" className="text-sm">
           <Table.Header>
             <Table.Column>#</Table.Column>

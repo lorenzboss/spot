@@ -51,7 +51,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 /**
  * Single Card Component
  */
-const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) => {
+const MemoryCard: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) => {
   const handleClick = () => {
     if (!disabled) {
       handleChoice(card);
@@ -362,7 +362,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
         <Card.Content className="grid grid-cols-4 gap-2 px-2 pb-2 sm:gap-4 sm:px-4 sm:pb-4">
           <Card className="bg-slate-50 shadow-none">
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
-              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+              <Chip
+                size="sm"
+                variant="flat"
+                className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
+              >
                 Time
               </Chip>
               <span className="text-lg font-bold text-slate-700">
@@ -372,7 +376,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
           </Card>
           <Card className="bg-slate-50 shadow-none">
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
-              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+              <Chip
+                size="sm"
+                variant="flat"
+                className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
+              >
                 Turns
               </Chip>
               <span className="text-lg font-bold text-slate-700">{turns}</span>
@@ -380,7 +388,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
           </Card>
           <Card className="bg-slate-50 shadow-none">
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
-              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+              <Chip
+                size="sm"
+                variant="flat"
+                className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
+              >
                 Matches
               </Chip>
               <span className="text-lg font-bold text-slate-700">{matches}/8</span>
@@ -388,7 +400,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
           </Card>
           <Card className="bg-slate-50 shadow-none">
             <Card.Content className="p-2 pb-1 text-center sm:p-3">
-              <Chip size="sm" variant="flat" className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs">
+              <Chip
+                size="sm"
+                variant="flat"
+                className="mb-1 bg-transparent px-0 text-[10px] text-slate-400 uppercase sm:text-xs"
+              >
                 Accuracy
               </Chip>
               <span className="text-lg font-bold text-slate-700">
@@ -406,7 +422,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
       {/* Game Grid */}
       <div className="mx-auto grid aspect-square w-full max-w-md grid-cols-4 gap-3 p-2 sm:gap-4">
         {cards.map((card) => (
-          <Card
+          <MemoryCard
             key={card.id}
             card={card}
             handleChoice={handleChoice}
