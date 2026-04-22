@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/convex/_generated/api';
+import { Button, Chip } from '@heroui/react';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
 import { LogOut, Settings, UsersRound } from 'lucide-react';
@@ -55,34 +56,42 @@ export default function Header() {
         {isAuthenticated && (
           <div className="flex items-center sm:gap-2">
             {currentUser?.username && (
-              <span className="max-w-50 truncate text-sm font-medium text-slate-600 sm:max-w-none">
+              <Chip size="sm" variant="soft" className="max-w-50 truncate bg-slate-100 text-slate-600 sm:max-w-none">
                 {formatGreeting(greetingTemplate, currentUser.username)}
-              </span>
+              </Chip>
             )}
             {currentUser?.role === 'admin' && (
-              <Link
-                href="/admin"
+              <Button
+                isIconOnly
+                variant="ghost"
                 title="Admin Panel"
-                className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
+                aria-label="Admin Panel"
+                className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                onPress={() => router.push('/admin')}
               >
                 <UsersRound className="h-4.5 w-4.5" />
-              </Link>
+              </Button>
             )}
-            <Link
-              href="/settings"
+            <Button
+              isIconOnly
+              variant="ghost"
               title="Settings"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              aria-label="Settings"
+              className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+              onPress={() => router.push('/settings')}
             >
               <Settings className="h-4.5 w-4.5" />
-            </Link>
-            <button
-              onClick={() => void handleSignOut()}
+            </Button>
+            <Button
+              isIconOnly
+              variant="ghost"
+              onPress={() => void handleSignOut()}
               title="Sign out"
               aria-label="Sign out"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="text-blue-600 hover:bg-blue-50 hover:text-blue-700"
             >
               <LogOut className="h-4.5 w-4.5" />
-            </button>
+            </Button>
           </div>
         )}
       </div>
