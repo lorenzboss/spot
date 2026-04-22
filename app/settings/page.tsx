@@ -13,8 +13,8 @@ export default function SettingsPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { signOut } = useAuthActions();
   const router = useRouter();
-  const currentUser = useQuery(api.myFunctions.getCurrentUser);
-  const updateUsername = useMutation(api.myFunctions.updateUsername);
+  const currentUser = useQuery(api.userFunctions.getCurrentUser);
+  const updateUsername = useMutation(api.userFunctions.updateUsername);
 
   const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -89,7 +89,7 @@ function SettingsForm({
   setSaveError,
   updateUsername,
 }: {
-  currentUser: NonNullable<ReturnType<typeof useQuery<typeof api.myFunctions.getCurrentUser>>>;
+  currentUser: NonNullable<ReturnType<typeof useQuery<typeof api.userFunctions.getCurrentUser>>>;
   username: string;
   setUsername: (v: string) => void;
   saving: boolean;
@@ -98,14 +98,14 @@ function SettingsForm({
   setSaveStatus: (v: 'idle' | 'success' | 'error') => void;
   saveError: string;
   setSaveError: (v: string) => void;
-  updateUsername: ReturnType<typeof useMutation<typeof api.myFunctions.updateUsername>>;
+  updateUsername: ReturnType<typeof useMutation<typeof api.userFunctions.updateUsername>>;
 }) {
   const normalized = username.trim().toLowerCase();
   const isUnchanged = normalized === (currentUser?.username ?? '');
   const isFormatValid = normalized.length >= 3 && normalized.length <= 20 && USERNAME_REGEX.test(normalized);
 
   const availabilityCheck = useQuery(
-    api.myFunctions.checkUsername,
+    api.userFunctions.checkUsername,
     !saving && isFormatValid && !isUnchanged ? { username: normalized } : 'skip',
   );
   const available: boolean | null = isUnchanged ? true : (availabilityCheck?.available ?? null);

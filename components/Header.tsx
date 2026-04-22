@@ -38,7 +38,7 @@ export default function Header() {
   const { isAuthenticated } = useConvexAuth();
   const { signOut } = useAuthActions();
   const router = useRouter();
-  const currentUser = useQuery(api.myFunctions.getCurrentUser);
+  const currentUser = useQuery(api.userFunctions.getCurrentUser);
   const [greetingTemplate] = useState(() => getGreetingByLocalTime(new Date()));
 
   async function handleSignOut() {

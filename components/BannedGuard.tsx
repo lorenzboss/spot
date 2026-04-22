@@ -11,7 +11,7 @@ export default function BannedGuard({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useConvexAuth();
   const { signOut } = useAuthActions();
   const router = useRouter();
-  const currentUser = useQuery(api.myFunctions.getCurrentUser);
+  const currentUser = useQuery(api.userFunctions.getCurrentUser);
 
   async function handleSignOut() {
     await signOut();

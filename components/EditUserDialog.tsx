@@ -49,7 +49,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
     normalizedUsername.length >= 3 && normalizedUsername.length <= 20 && USERNAME_REGEX.test(normalizedUsername);
 
   const usernameAvailabilityCheck = useQuery(
-    api.myFunctions.checkUsername,
+    api.userFunctions.checkUsername,
     !saving && usernameFormatValid && !usernameUnchanged ? { username: normalizedUsername } : 'skip',
   );
   const usernameAvailable: boolean | null = usernameUnchanged ? true : (usernameAvailabilityCheck?.available ?? null);
@@ -62,7 +62,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
   const emailFormatValid = EMAIL_REGEX.test(normalizedEmail);
 
   const emailAvailabilityCheck = useQuery(
-    api.myFunctions.checkEmail,
+    api.userFunctions.checkEmail,
     !saving && emailFormatValid && !emailUnchanged ? { email: normalizedEmail } : 'skip',
   );
   const emailTaken: boolean | null = emailUnchanged ? false : (emailAvailabilityCheck?.exists ?? null);

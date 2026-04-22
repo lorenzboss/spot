@@ -15,7 +15,7 @@ function formatScore(score: number) {
 }
 
 export default function Leaderboard() {
-  const topScores = useQuery(api.myFunctions.getTopScores);
+  const topScores = useQuery(api.scoreFunctions.getTopScores);
 
   if (!topScores || topScores.length === 0) {
     return (

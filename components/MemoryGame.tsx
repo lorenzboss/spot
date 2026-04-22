@@ -118,7 +118,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [scoreSaved, setScoreSaved] = useState(false);
 
   // Convex hooks
-  const saveGameScore = useMutation(api.myFunctions.saveGameScore);
+  const saveGameScore = useMutation(api.scoreFunctions.saveGameScore);
 
   // Initialize game
   const shuffleCards = () => {

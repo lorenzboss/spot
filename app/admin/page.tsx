@@ -49,7 +49,7 @@ type UserGameStats = {
 export default function AdminPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
-  const currentUser = useQuery(api.myFunctions.getCurrentUser);
+  const currentUser = useQuery(api.userFunctions.getCurrentUser);
   const isAdmin = isAuthenticated && currentUser?.role === 'admin';
   const users = useQuery(api.admin.listAllUsers, isAdmin ? {} : 'skip');
 

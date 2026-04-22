@@ -34,13 +34,13 @@ export default function SignUpPage() {
   }, [isAuthenticated, pendingRedirect, router]);
 
   const usernameCheck = useQuery(
-    api.myFunctions.checkUsername,
+    api.userFunctions.checkUsername,
     !loading && username.trim().length >= 3 && USERNAME_REGEX.test(username.trim()) ? { username } : 'skip',
   );
   const usernameAvailable = usernameCheck?.available ?? null;
 
   const emailCheck = useQuery(
-    api.myFunctions.checkEmail,
+    api.userFunctions.checkEmail,
     !loading && EMAIL_REGEX.test(email.trim()) ? { email: email.trim() } : 'skip',
   );
   const emailTaken = emailCheck?.exists ?? false;
