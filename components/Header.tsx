@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { LogOut, BarChart3, Settings, UsersRound } from 'lucide-react';
+import { BarChart3, Gamepad2, LogOut, Settings, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -59,36 +59,43 @@ export default function Header() {
                 {formatGreeting(greetingTemplate, currentUser.username)}
               </span>
             )}
-            {currentUser?.role === 'admin' && (
-              <Link
-                href="/admin"
-                title="Admin Panel"
-                className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
-              >
-                <UsersRound className="h-4.5 w-4.5" />
-              </Link>
-            )}
+            <Link
+              href="/"
+              title="Home"
+              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+            >
+              <Gamepad2 className="size-5" />
+            </Link>
             <Link
               href="/stats"
               title="My Stats"
               className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
             >
-              <BarChart3 className="h-4.5 w-4.5" />
+              <BarChart3 className="size-4.5" />
             </Link>
             <Link
               href="/settings"
               title="Settings"
               className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
             >
-              <Settings className="h-4.5 w-4.5" />
+              <Settings className="size-4.5" />
             </Link>
+             {currentUser?.role === 'admin' && (
+              <Link
+                href="/admin"
+                title="Admin Panel"
+                className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
+              >
+                <UsersRound className="size-4.5" />
+              </Link>
+            )}
             <button
               onClick={() => void handleSignOut()}
               title="Sign out"
               aria-label="Sign out"
               className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
             >
-              <LogOut className="h-4.5 w-4.5" />
+              <LogOut className="size-4.5" />
             </button>
           </div>
         )}
