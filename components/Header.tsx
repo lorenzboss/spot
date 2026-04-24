@@ -62,21 +62,21 @@ export default function Header() {
             <Link
               href="/"
               title="Home"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
             >
               <Gamepad2 className="size-5" />
             </Link>
             <Link
               href="/stats"
               title="My Stats"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
             >
               <BarChart3 className="size-4.5" />
             </Link>
             <Link
               href="/settings"
               title="Settings"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
             >
               <Settings className="size-4.5" />
             </Link>
@@ -84,7 +84,7 @@ export default function Header() {
               <Link
                 href="/admin"
                 title="Admin Panel"
-                className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50"
+                className="rounded-md p-1.5 transition-colors hover:bg-blue-50"
               >
                 <UsersRound className="size-4.5" />
               </Link>
@@ -93,7 +93,7 @@ export default function Header() {
               onClick={() => void handleSignOut()}
               title="Sign out"
               aria-label="Sign out"
-              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 hover:opacity-80 text-[#2563eb]"
             >
               <LogOut className="size-4.5" />
             </button>
