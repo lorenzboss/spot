@@ -5,7 +5,7 @@ import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useMutation, useQuery } from 'convex/react';
 import { Check, Loader2, ShieldBan, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const USERNAME_REGEX = /^[a-zA-Z0-9-]+$/;
 
@@ -104,6 +104,18 @@ function SettingsForm({
   const isUnchanged = normalized === (currentUser?.username ?? '');
   const isFormatValid = normalized.length >= 3 && normalized.length <= 20 && USERNAME_REGEX.test(normalized);
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Safari ignores standard HTML attributes, so we explicitly remove focus on load
+    const timer = setTimeout(() => {
+      if (document.activeElement === inputRef.current) {
+        inputRef.current?.blur();
+      }
+    }, 10);
+    return () => clearTimeout(timer);
+  }, []);
+
   const availabilityCheck = useQuery(
     api.userFunctions.checkUsername,
     !saving && isFormatValid && !isUnchanged ? { username: normalized } : 'skip',
@@ -144,8 +156,10 @@ function SettingsForm({
               <label className="text-sm font-medium text-slate-700">Username</label>
               <div className="relative">
                 <input
+                  ref={inputRef}
                   type="text"
                   value={username}
+                  autoComplete="off"
                   onChange={(e) => {
                     setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
                     setSaveStatus('idle');
