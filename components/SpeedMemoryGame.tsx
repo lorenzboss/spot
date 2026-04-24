@@ -124,6 +124,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   const [showAll, setShowAll] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
   const [isGameActive, setIsGameActive] = useState(false);
+  const [currentScore, setCurrentScore] = useState<number | null>(null);
 
   const revealGeneration = useRef(0); // incremented on every restart to cancel stale reveal loops
   const saveGameScore = useMutation(api.scoreFunctions.saveGameScore);
@@ -183,6 +184,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       setShowAll(false);
       setScoreSaved(false);
       setIsGameActive(false);
+      setCurrentScore(null);
     },
     [buildCards, router],
   );
@@ -205,6 +207,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
     setShowAll(false);
     setScoreSaved(false);
     setIsGameActive(false);
+    setCurrentScore(null);
   }, [router]);
 
   // ── Begin reveal (called when user presses Start) ─────────────────────
@@ -314,8 +317,13 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       difficulty,
       revealMode: revealMode ?? 'sequential',
     })
-      .then(() => setScoreSaved(true))
-      .catch(() => {});
+      .then((score) => {
+        setScoreSaved(true);
+        setCurrentScore(score);
+      })
+      .catch(() => {
+        setScoreSaved(true);
+      });
   }, [phase, scoreSaved, time, difficulty, revealMode, saveGameScore]);
 
   // ── Derived flipped state ────────────────────────────────────────────────
@@ -542,7 +550,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       </button>
 
       {/* Won Modal */}
-      {phase === 'won' && (
+      {phase === 'won' && scoreSaved && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
           <div className="animate-bounce-in w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-xl">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500">
@@ -563,6 +571,12 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
                   {modeLabel}
                 </div>
               </div>
+              {currentScore !== null && (
+                <div className="col-span-2 rounded-lg bg-slate-50 p-3">
+                  <div className="text-xs tracking-wider text-slate-400 uppercase">Score</div>
+                  <div className="mt-1 text-xl font-bold text-slate-700">{currentScore.toLocaleString()}</div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col gap-2">

@@ -46,6 +46,8 @@ export const saveGameScore = mutation({
       difficulty: args.difficulty,
       revealMode: args.revealMode,
     });
+
+    return score;
   },
 });
 

@@ -116,6 +116,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [time, setTime] = useState(0);
   const [isGameActive, setIsGameActive] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
+  const [currentScore, setCurrentScore] = useState<number | null>(null);
 
   // Convex hooks
   const saveGameScore = useMutation(api.scoreFunctions.saveGameScore);
@@ -167,6 +168,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
     setTime(0);
     setIsGameActive(false);
     setScoreSaved(false);
+    setCurrentScore(null);
   };
 
   // Reset turn
@@ -302,11 +304,13 @@ export default function MemoryGame({ title, description }: { title?: string; des
       const correct = counted.filter((t) => t.isCorrect).length;
       const accuracy = counted.length === 0 ? 100 : Math.round((correct / counted.length) * 100);
       saveGameScore({ turns, time, accuracy })
-        .then(() => {
+        .then((score) => {
           setScoreSaved(true);
+          setCurrentScore(score);
         })
         .catch(() => {
           // score save failed silently
+          setScoreSaved(true);
         });
     }
   }, [isWon, scoreSaved, turns, time, attempts, turnsLog, saveGameScore]);
@@ -426,7 +430,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
       </div>
 
       {/* Win Modal Overlay */}
-      {isWon && (
+      {isWon && scoreSaved && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
           <div className="animate-bounce-in w-full max-w-sm scale-100 transform rounded-3xl bg-white p-8 text-center shadow-xl transition-all">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500">
@@ -455,6 +459,12 @@ export default function MemoryGame({ title, description }: { title?: string; des
                   })()}
                 </div>
               </div>
+              {currentScore !== null && (
+                <div className="col-span-2 rounded-lg bg-slate-50 p-3">
+                  <div className="text-xs tracking-wider text-slate-400 uppercase">Score</div>
+                  <div className="mt-1 text-xl font-bold text-slate-700">{currentScore.toLocaleString()}</div>
+                </div>
+              )}
             </div>
 
             <button
