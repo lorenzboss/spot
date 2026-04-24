@@ -100,13 +100,22 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isWr
 const TOTAL_PAIRS = 8;
 const CARD_GAP_MS = 0;
 
-export default function SpeedMemoryGame({ title, description }: { title?: string; description?: string }) {
+export default function SpeedMemoryGame({
+  title,
+  description,
+  initialMode,
+  initialDifficulty,
+}: {
+  title?: string;
+  description?: string;
+  initialMode?: RevealMode;
+  initialDifficulty?: Difficulty;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [cards, setCards] = useState<CardData[]>([]);
-  const [phase, setPhase] = useState<GamePhase>("select");
-  const [revealMode, setRevealMode] = useState<RevealMode | null>(null);
-  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [phase, setPhase] = useState<GamePhase>(initialMode ? "ready" : "select");
+  const [revealMode, setRevealMode] = useState<RevealMode | null>(initialMode ?? null);
+  const [difficulty, setDifficulty] = useState<Difficulty>(initialDifficulty ?? "easy");
 
   // Index into `revealOrder` currently being shown (-1 = none)
   const [activeRevealCardId, setActiveRevealCardId] = useState<number>(-1);
@@ -160,6 +169,11 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   // ── Start game with chosen mode + difficulty ─────────────────────────────
   const startGame = useCallback(
     (mode: RevealMode, diff: Difficulty) => {
+      if (!initialMode) {
+        router.push(`/play/speed/game?mode=${mode}&difficulty=${diff}`);
+        return;
+      }
+
       revealGeneration.current += 1;
       const newCards = buildCards();
       const order = mode === "sequential" ? newCards.map((c) => c.id) : shuffleArray(newCards.map((c) => c.id));
@@ -184,28 +198,13 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       setIsGameActive(false);
       setCurrentScore(null);
     },
-    [buildCards, router],
+    [buildCards, router, initialMode],
   );
 
   // ── Reset to mode-select screen ──────────────────────────────────────────
   const resetToSelect = useCallback(() => {
     revealGeneration.current += 1; // cancel any running reveal loop
-    router.replace("?", { scroll: false }); // clear mode from URL
-    setPhase("select");
-    setRevealMode(null);
-    setCards([]);
-    setRevealOrder([]);
-    setActiveRevealCardId(-1);
-    setChoiceOne(null);
-    setChoiceTwo(null);
-    setDisabled(true);
-    setMatches(0);
-    setTime(0);
-    setWrongCards([]);
-    setShowAll(false);
-    setScoreSaved(false);
-    setIsGameActive(false);
-    setCurrentScore(null);
+    router.back();
   }, [router]);
 
   // ── Begin reveal (called when user presses Start) ─────────────────────
@@ -213,17 +212,13 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
     setPhase("revealing");
   }, []);
 
-  // ── Auto-start from URL on first load ───────────────────────────────────
+  // ── Auto-start if props are provided ────────────────────────────────────
   useEffect(() => {
-    const modeParam = searchParams.get("mode");
-    const diffParam = searchParams.get("difficulty");
-    const diff: Difficulty = diffParam === "medium" ? "medium" : diffParam === "hard" ? "hard" : "easy";
-    if (modeParam === "sequential" || modeParam === "random") {
-      startGame(modeParam, diff);
+    if (initialMode) {
+      startGame(initialMode, initialDifficulty ?? "easy");
     }
-    // Only run once on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialMode, initialDifficulty, startGame]);
+
 
   // ── Reveal sequence ──────────────────────────────────────────────────────
   useEffect(() => {

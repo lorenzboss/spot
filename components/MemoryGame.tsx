@@ -2,7 +2,8 @@
 
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Gamepad, RefreshCw, Trophy } from "lucide-react";
+import { Gamepad, RefreshCw, Trophy, Undo2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface CardData {
@@ -142,6 +143,7 @@ export default function MemoryGame({
   description?: string;
   playersCount?: number;
 }) {
+  const router = useRouter();
   const [cards, setCards] = useState<CardData[]>([]);
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState<CardData | null>(null);
@@ -420,13 +422,22 @@ export default function MemoryGame({
             <p className="mt-1 text-sm text-slate-500">{description}</p>
           </div>
 
-          <button
-            onClick={shuffleCards}
-            className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
-            title="New Game"
-          >
-            <RefreshCw className="h-5 w-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.back()}
+              className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
+              title="Go Back"
+            >
+              <Undo2 className="h-5 w-5" />
+            </button>
+            <button
+              onClick={shuffleCards}
+              className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
+              title="New Game"
+            >
+              <RefreshCw className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
