@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import EditUserDialog from '@/components/EditUserDialog';
-import UserGamesDialog from '@/components/UserGamesDialog';
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
+import EditUserDialog from "@/components/EditUserDialog";
+import UserGamesDialog from "@/components/UserGamesDialog";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import {
   ColumnDef,
   flexRender,
@@ -11,14 +11,14 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
-} from '@tanstack/react-table';
-import { useConvexAuth, useQuery } from 'convex/react';
-import { ArrowUpDown, BarChart3, ChevronDown, ChevronUp, Loader2, Pencil } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+} from "@tanstack/react-table";
+import { useConvexAuth, useQuery } from "convex/react";
+import { ArrowUpDown, BarChart3, ChevronDown, ChevronUp, Loader2, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 type UserRow = {
-  _id: Id<'users'>;
+  _id: Id<"users">;
   username: string | null;
   email: string | null;
   role: string;
@@ -28,7 +28,7 @@ type UserRow = {
 };
 
 type UserGameStats = {
-  userId: Id<'users'>;
+  userId: Id<"users">;
   totalGames: number;
   averages: {
     score: number;
@@ -50,22 +50,22 @@ export default function AdminPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const router = useRouter();
   const currentUser = useQuery(api.userFunctions.getCurrentUser);
-  const isAdmin = isAuthenticated && currentUser?.role === 'admin';
-  const users = useQuery(api.admin.listAllUsers, isAdmin ? {} : 'skip');
+  const isAdmin = isAuthenticated && currentUser?.role === "admin";
+  const users = useQuery(api.admin.listAllUsers, isAdmin ? {} : "skip");
 
   const [sorting, setSorting] = useState<SortingState>([
-    { id: 'isBanned', desc: false },
-    { id: 'role', desc: false },
-    { id: 'username', desc: false },
+    { id: "isBanned", desc: false },
+    { id: "role", desc: false },
+    { id: "username", desc: false },
   ]);
-  const [editingUserId, setEditingUserId] = useState<Id<'users'> | null>(null);
-  const [loadingGamesUserId, setLoadingGamesUserId] = useState<Id<'users'> | null>(null);
-  const [viewingGamesUserId, setViewingGamesUserId] = useState<Id<'users'> | null>(null);
+  const [editingUserId, setEditingUserId] = useState<Id<"users"> | null>(null);
+  const [loadingGamesUserId, setLoadingGamesUserId] = useState<Id<"users"> | null>(null);
+  const [viewingGamesUserId, setViewingGamesUserId] = useState<Id<"users"> | null>(null);
   const [viewingGameStats, setViewingGameStats] = useState<UserGameStats | null>(null);
 
   const loadedGameStats = useQuery(
     api.admin.getUserGameStats,
-    isAdmin && loadingGamesUserId ? { userId: loadingGamesUserId } : 'skip',
+    isAdmin && loadingGamesUserId ? { userId: loadingGamesUserId } : "skip",
   );
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function AdminPage() {
     setLoadingGamesUserId(null);
   }, [loadedGameStats, loadingGamesUserId]);
 
-  function openGamesDialog(userId: Id<'users'>) {
+  function openGamesDialog(userId: Id<"users">) {
     setViewingGamesUserId(null);
     setViewingGameStats(null);
     setLoadingGamesUserId(userId);
@@ -91,22 +91,22 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isLoading || currentUser === undefined) return;
-    if (!isAuthenticated || !currentUser || currentUser.role !== 'admin') {
-      router.replace('/');
+    if (!isAuthenticated || !currentUser || currentUser.role !== "admin") {
+      router.replace("/");
     }
   }, [isAuthenticated, isLoading, currentUser, router]);
 
   const columns = useMemo<ColumnDef<UserRow>[]>(
     () => [
       {
-        id: 'actions',
+        id: "actions",
         header: () => <span className="sr-only">Actions</span>,
         enableSorting: false,
         cell: ({ row }) => (
           <div className="flex items-center justify-start gap-1">
             <button
               title="Show games"
-              aria-label={`Show games for ${row.original.username ?? 'user'}`}
+              aria-label={`Show games for ${row.original.username ?? "user"}`}
               onClick={() => openGamesDialog(row.original._id)}
               disabled={loadingGamesUserId !== null}
               className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
@@ -119,7 +119,7 @@ export default function AdminPage() {
             </button>
             <button
               title="Edit user"
-              aria-label={`Edit ${row.original.username ?? 'user'}`}
+              aria-label={`Edit ${row.original.username ?? "user"}`}
               onClick={() => setEditingUserId(row.original._id)}
               className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
             >
@@ -129,8 +129,8 @@ export default function AdminPage() {
         ),
       },
       {
-        accessorKey: 'username',
-        header: 'Username',
+        accessorKey: "username",
+        header: "Username",
         cell: ({ row }) => {
           const isSelf = row.original._id === currentUser?._id;
           return (
@@ -142,27 +142,27 @@ export default function AdminPage() {
             </span>
           );
         },
-        sortingFn: 'alphanumericCaseSensitive',
+        sortingFn: "alphanumericCaseSensitive",
       },
       {
-        accessorKey: 'email',
-        header: 'E-Mail',
+        accessorKey: "email",
+        header: "E-Mail",
         cell: ({ getValue }) => (
           <span className="text-slate-600">
             {getValue<string | null>() ?? <span className="text-slate-400 italic">—</span>}
           </span>
         ),
-        sortingFn: 'alphanumericCaseSensitive',
+        sortingFn: "alphanumericCaseSensitive",
       },
       {
-        accessorKey: 'role',
-        header: 'Role',
+        accessorKey: "role",
+        header: "Role",
         cell: ({ getValue }) => {
           const role = getValue<string>();
           return (
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                role === 'admin' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                role === "admin" ? "bg-blue-100 text-blue-700" : "bg-slate-100 text-slate-600"
               }`}
             >
               {role}
@@ -171,8 +171,8 @@ export default function AdminPage() {
         },
       },
       {
-        accessorKey: 'isBanned',
-        header: 'Status',
+        accessorKey: "isBanned",
+        header: "Status",
         cell: ({ getValue }) =>
           getValue<boolean>() ? (
             <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">Banned</span>
@@ -184,8 +184,8 @@ export default function AdminPage() {
         sortingFn: (a, b) => Number(a.original.isBanned) - Number(b.original.isBanned),
       },
       {
-        accessorKey: 'highscore',
-        header: 'Highscore',
+        accessorKey: "highscore",
+        header: "Highscore",
         cell: ({ getValue }) => {
           const v = getValue<number | null>();
           return (
@@ -197,8 +197,8 @@ export default function AdminPage() {
         sortingFn: (a, b) => (a.original.highscore ?? -1) - (b.original.highscore ?? -1),
       },
       {
-        accessorKey: 'gamesPlayed',
-        header: 'Games',
+        accessorKey: "gamesPlayed",
+        header: "Games",
         cell: ({ getValue }) => (
           <span className="font-mono text-sm text-slate-700 tabular-nums">{getValue<number>().toLocaleString()}</span>
         ),
@@ -244,20 +244,20 @@ export default function AdminPage() {
     );
   }
 
-  if (!isAuthenticated || !currentUser || currentUser.role !== 'admin') return null;
+  if (!isAuthenticated || !currentUser || currentUser.role !== "admin") return null;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl min-w-0 flex-1 flex-col gap-6 p-4 py-8 sm:p-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Admin Panel</h1>
         <span className="text-sm text-slate-500">
-          {tableData.length} user{tableData.length !== 1 ? 's' : ''}
+          {tableData.length} user{tableData.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       <div
         className="min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-2xl border border-slate-200 bg-white shadow-sm"
-        style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-x' }}
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x" }}
       >
         <table className="w-max min-w-full text-sm">
           <thead>
@@ -269,16 +269,16 @@ export default function AdminPage() {
                   return (
                     <th
                       key={header.id}
-                      className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${canSort ? 'cursor-pointer select-none hover:text-slate-800' : ''}`}
+                      className={`px-4 py-3 text-left text-xs font-semibold tracking-wide whitespace-nowrap text-slate-500 uppercase ${canSort ? "cursor-pointer select-none hover:text-slate-800" : ""}`}
                       onClick={header.column.getToggleSortingHandler()}
                     >
                       <span className="inline-flex items-center gap-1">
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {canSort && (
                           <span className="text-slate-400">
-                            {sorted === 'asc' ? (
+                            {sorted === "asc" ? (
                               <ChevronUp className="h-3.5 w-3.5" />
-                            ) : sorted === 'desc' ? (
+                            ) : sorted === "desc" ? (
                               <ChevronDown className="h-3.5 w-3.5" />
                             ) : (
                               <ArrowUpDown className="h-3.5 w-3.5 opacity-40" />
@@ -309,7 +309,7 @@ export default function AdminPage() {
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className={`border-t border-slate-100 transition-colors hover:bg-slate-50 ${row.original.isBanned ? 'opacity-55' : ''}`}
+                  className={`border-t border-slate-100 transition-colors hover:bg-slate-50 ${row.original.isBanned ? "opacity-55" : ""}`}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-4 py-3 whitespace-nowrap">

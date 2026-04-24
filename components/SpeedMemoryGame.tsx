@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useMutation } from 'convex/react';
-import { ArrowRight, Brain, RefreshCw, Shuffle, Trophy, Undo2 } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { ArrowRight, Brain, RefreshCw, Shuffle, Trophy, Undo2 } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -14,8 +14,8 @@ interface CardData {
   matched: boolean;
 }
 
-type RevealMode = 'sequential' | 'random';
-type Difficulty = 'easy' | 'medium' | 'hard';
+type RevealMode = "sequential" | "random";
+type Difficulty = "easy" | "medium" | "hard";
 
 const DIFFICULTY_SHOW_MS: Record<Difficulty, number> = {
   easy: 3000,
@@ -24,12 +24,12 @@ const DIFFICULTY_SHOW_MS: Record<Difficulty, number> = {
 };
 
 type GamePhase =
-  | 'select' // choosing sub-mode
-  | 'ready' // cards generated, waiting for user to press Start
-  | 'revealing' // one card at a time being shown
-  | 'playing' // player picks pairs
-  | 'lost'
-  | 'won';
+  | "select" // choosing sub-mode
+  | "ready" // cards generated, waiting for user to press Start
+  | "revealing" // one card at a time being shown
+  | "playing" // player picks pairs
+  | "lost"
+  | "won";
 
 interface CardProps {
   card: CardData;
@@ -57,25 +57,25 @@ const delay = (ms: number) => new Promise<void>((res) => setTimeout(res, ms));
 
 const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isWrong, isActiveReveal }) => (
   <div
-    className={`group relative aspect-square cursor-pointer perspective-[1000px] ${isWrong ? 'animate-shake' : ''}`}
+    className={`group relative aspect-square cursor-pointer perspective-[1000px] ${isWrong ? "animate-shake" : ""}`}
     onClick={() => !disabled && handleChoice(card)}
   >
     <div
       className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-[350ms] transform-3d ${
         flipped
           ? card.matched
-            ? 'transform-[rotateY(180deg)] border-green-400/90 shadow-green-100'
+            ? "transform-[rotateY(180deg)] border-green-400/90 shadow-green-100"
             : isWrong
-              ? 'transform-[rotateY(180deg)] border-red-500 shadow-red-200'
+              ? "transform-[rotateY(180deg)] border-red-500 shadow-red-200"
               : isActiveReveal
-                ? 'transform-[rotateY(180deg)] border-violet-400 shadow-violet-100'
-                : 'transform-[rotateY(180deg)] border-blue-400/90'
-          : 'border-slate-200 hover:border-purple-300'
+                ? "transform-[rotateY(180deg)] border-violet-400 shadow-violet-100"
+                : "transform-[rotateY(180deg)] border-blue-400/90"
+          : "border-slate-200 hover:border-purple-300"
       }`}
     >
       {/* Front */}
       <div
-        className={`absolute inset-0 flex transform-[rotateY(180deg)] items-center justify-center overflow-hidden rounded-[10px] bg-white backface-hidden ${flipped ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 flex transform-[rotateY(180deg)] items-center justify-center overflow-hidden rounded-[10px] bg-white backface-hidden ${flipped ? "opacity-100" : "opacity-0"}`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
@@ -87,7 +87,7 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isWr
 
       {/* Back */}
       <div
-        className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden ${!flipped ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden ${!flipped ? "opacity-100" : "opacity-0"}`}
       >
         <Brain className="h-8 w-8 text-slate-300 opacity-50" />
       </div>
@@ -104,9 +104,9 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   const router = useRouter();
   const searchParams = useSearchParams();
   const [cards, setCards] = useState<CardData[]>([]);
-  const [phase, setPhase] = useState<GamePhase>('select');
+  const [phase, setPhase] = useState<GamePhase>("select");
   const [revealMode, setRevealMode] = useState<RevealMode | null>(null);
-  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
 
   // Index into `revealOrder` currently being shown (-1 = none)
   const [activeRevealCardId, setActiveRevealCardId] = useState<number>(-1);
@@ -150,9 +150,9 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       labels
         .slice(row * 4, row * 4 + 4)
         .map((n) => String(n).padStart(2))
-        .join(' '),
+        .join(" "),
     );
-    if (process.env.NODE_ENV === 'development') console.log('🃏 Solution:\n' + rows.join('\n'));
+    if (process.env.NODE_ENV === "development") console.log("🃏 Solution:\n" + rows.join("\n"));
 
     return shuffled;
   }, []);
@@ -162,7 +162,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
     (mode: RevealMode, diff: Difficulty) => {
       revealGeneration.current += 1;
       const newCards = buildCards();
-      const order = mode === 'sequential' ? newCards.map((c) => c.id) : shuffleArray(newCards.map((c) => c.id));
+      const order = mode === "sequential" ? newCards.map((c) => c.id) : shuffleArray(newCards.map((c) => c.id));
 
       router.replace(`?mode=${mode}&difficulty=${diff}`, { scroll: false });
 
@@ -170,7 +170,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       setDifficulty(diff);
       setCards(newCards);
       setRevealOrder(order);
-      setPhase('ready');
+      setPhase("ready");
       setActiveRevealCardId(-1);
       setRevealProgress([0, newCards.length]);
       setChoiceOne(null);
@@ -190,8 +190,8 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   // ── Reset to mode-select screen ──────────────────────────────────────────
   const resetToSelect = useCallback(() => {
     revealGeneration.current += 1; // cancel any running reveal loop
-    router.replace('?', { scroll: false }); // clear mode from URL
-    setPhase('select');
+    router.replace("?", { scroll: false }); // clear mode from URL
+    setPhase("select");
     setRevealMode(null);
     setCards([]);
     setRevealOrder([]);
@@ -210,15 +210,15 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
   // ── Begin reveal (called when user presses Start) ─────────────────────
   const beginReveal = useCallback(() => {
-    setPhase('revealing');
+    setPhase("revealing");
   }, []);
 
   // ── Auto-start from URL on first load ───────────────────────────────────
   useEffect(() => {
-    const modeParam = searchParams.get('mode');
-    const diffParam = searchParams.get('difficulty');
-    const diff: Difficulty = diffParam === 'medium' ? 'medium' : diffParam === 'hard' ? 'hard' : 'easy';
-    if (modeParam === 'sequential' || modeParam === 'random') {
+    const modeParam = searchParams.get("mode");
+    const diffParam = searchParams.get("difficulty");
+    const diff: Difficulty = diffParam === "medium" ? "medium" : diffParam === "hard" ? "hard" : "easy";
+    if (modeParam === "sequential" || modeParam === "random") {
       startGame(modeParam, diff);
     }
     // Only run once on mount
@@ -227,7 +227,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
   // ── Reveal sequence ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (phase !== 'revealing' || revealOrder.length === 0) return;
+    if (phase !== "revealing" || revealOrder.length === 0) return;
     const myGeneration = revealGeneration.current;
 
     const run = async () => {
@@ -242,24 +242,24 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       }
       if (revealGeneration.current !== myGeneration) return; // stale – abort
       // Done – start playing
-      setPhase('playing');
+      setPhase("playing");
       setDisabled(false);
       setIsGameActive(true);
     };
 
     run();
-  }, [phase, revealOrder]);
+  }, [phase, revealOrder, difficulty]);
 
   // ── Timer ────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (!isGameActive || phase !== 'playing') return;
+    if (!isGameActive || phase !== "playing") return;
     const id = setInterval(() => setTime((t) => t + 1), 1000);
     return () => clearInterval(id);
   }, [isGameActive, phase]);
 
   // ── Player choice ────────────────────────────────────────────────────────
   const handleChoice = (card: CardData) => {
-    if (disabled || card.matched || phase !== 'playing') return;
+    if (disabled || card.matched || phase !== "playing") return;
     if (choiceOne && card.id === choiceOne.id) return;
     if (!choiceOne) setChoiceOne(card);
     else setChoiceTwo(card);
@@ -290,16 +290,16 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
       }, 600);
       // 3) After showing them for a moment, show the Game Over modal
       setTimeout(() => {
-        setPhase('lost');
+        setPhase("lost");
       }, 600 + 1400);
     }
   }, [choiceOne, choiceTwo, resetTurn]);
 
   // ── Win ──────────────────────────────────────────────────────────────────
   useEffect(() => {
-    if (phase === 'playing' && cards.length > 0 && cards.every((c) => c.matched)) {
+    if (phase === "playing" && cards.length > 0 && cards.every((c) => c.matched)) {
       setTimeout(() => {
-        setPhase('won');
+        setPhase("won");
         setIsGameActive(false);
       }, 400);
     }
@@ -307,12 +307,12 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
   // ── Save score ───────────────────────────────────────────────────────────
   useEffect(() => {
-    if (phase !== 'won' || scoreSaved) return;
+    if (phase !== "won" || scoreSaved) return;
     saveGameScore({
       time,
-      gameMode: 'speed',
+      gameMode: "speed",
       difficulty,
-      revealMode: revealMode ?? 'sequential',
+      revealMode: revealMode ?? "sequential",
     })
       .then((score) => {
         setScoreSaved(true);
@@ -325,22 +325,22 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
   // ── Derived flipped state ────────────────────────────────────────────────
   const isFlipped = (card: CardData): boolean => {
-    if (phase === 'revealing') return card.id === activeRevealCardId;
+    if (phase === "revealing") return card.id === activeRevealCardId;
     // When showAll is active (after wrong pick), reveal every unmatched card
     if (showAll) return true;
-    if (phase === 'playing' || phase === 'lost' || phase === 'won')
+    if (phase === "playing" || phase === "lost" || phase === "won")
       return card.matched || card === choiceOne || card === choiceTwo;
     return false;
   };
 
-  const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, '0')}`;
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toString().padStart(2, "0")}`;
 
   // ─────────────────────────────────────────────────────────────────────────
   // Render
   // ─────────────────────────────────────────────────────────────────────────
 
   // ── Mode-select screen ───────────────────────────────────────────────────
-  if (phase === 'select') {
+  if (phase === "select") {
     return (
       <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center gap-6">
         <div className="w-full rounded-2xl border border-slate-100 bg-white p-6 shadow-sm sm:p-8">
@@ -352,11 +352,11 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           {/* Difficulty */}
           <p className="mb-2 text-xs font-semibold tracking-wider text-slate-400 uppercase">Difficulty</p>
           <div className="mb-6 flex gap-2">
-            {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
+            {(["easy", "medium", "hard"] as Difficulty[]).map((d) => {
               const meta = {
-                easy: { label: 'Easy', ms: '3s', color: 'green' },
-                medium: { label: 'Medium', ms: '1.5s', color: 'yellow' },
-                hard: { label: 'Hard', ms: '0.7s', color: 'red' },
+                easy: { label: "Easy", ms: "3s", color: "green" },
+                medium: { label: "Medium", ms: "1.5s", color: "yellow" },
+                hard: { label: "Hard", ms: "0.7s", color: "red" },
               }[d];
               const active = difficulty === d;
               return (
@@ -365,12 +365,12 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
                   onClick={() => setDifficulty(d)}
                   className={`flex flex-1 flex-col items-center rounded-xl border-2 py-3 text-sm font-semibold transition-all active:scale-95 ${
                     active
-                      ? d === 'easy'
-                        ? 'border-green-400 bg-green-50 text-green-700'
-                        : d === 'medium'
-                          ? 'border-yellow-400 bg-yellow-50 text-yellow-700'
-                          : 'border-red-400 bg-red-50 text-red-700'
-                      : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50'
+                      ? d === "easy"
+                        ? "border-green-400 bg-green-50 text-green-700"
+                        : d === "medium"
+                          ? "border-yellow-400 bg-yellow-50 text-yellow-700"
+                          : "border-red-400 bg-red-50 text-red-700"
+                      : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                   }`}
                 >
                   {meta.label}
@@ -384,7 +384,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           <p className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">Reveal mode</p>
           <div className="flex flex-col gap-3">
             <button
-              onClick={() => startGame('sequential', difficulty)}
+              onClick={() => startGame("sequential", difficulty)}
               className="group flex items-center gap-4 rounded-xl border-2 border-slate-200 bg-white p-4 text-left transition-all hover:border-violet-400 hover:bg-violet-50 hover:shadow-sm active:scale-[.98]"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-600 transition-colors group-hover:bg-violet-200">
@@ -398,7 +398,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
             </button>
 
             <button
-              onClick={() => startGame('random', difficulty)}
+              onClick={() => startGame("random", difficulty)}
               className="group flex items-center gap-4 rounded-xl border-2 border-slate-200 bg-white p-4 text-left transition-all hover:border-purple-400 hover:bg-purple-50 hover:shadow-sm active:scale-[.98]"
             >
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-purple-600 transition-colors group-hover:bg-purple-200">
@@ -423,7 +423,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   }
 
   // ── Game UI ──────────────────────────────────────────────────────────────
-  const modeLabel = revealMode === 'sequential' ? 'Sequential' : 'Random';
+  const modeLabel = revealMode === "sequential" ? "Sequential" : "Random";
 
   return (
     <div className="mx-auto flex w-full max-w-xl flex-col items-center justify-center">
@@ -435,7 +435,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
               {title}
             </h1>
             <div className="mt-0.5 flex items-center gap-1.5">
-              {revealMode === 'sequential' ? (
+              {revealMode === "sequential" ? (
                 <ArrowRight className="h-3.5 w-3.5 text-violet-500" />
               ) : (
                 <Shuffle className="h-3.5 w-3.5 text-violet-500" />
@@ -443,11 +443,11 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
               <span className="text-xs font-medium text-slate-400">{modeLabel} mode</span>
               <span
                 className={`ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                  difficulty === 'easy'
-                    ? 'bg-green-100 text-green-700'
-                    : difficulty === 'medium'
-                      ? 'bg-yellow-100 text-yellow-700'
-                      : 'bg-red-100 text-red-700'
+                  difficulty === "easy"
+                    ? "bg-green-100 text-green-700"
+                    : difficulty === "medium"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-red-100 text-red-700"
                 }`}
               >
                 {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
@@ -487,18 +487,18 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           </div>
           <div
             className={`rounded-lg p-2 text-center transition-colors ${
-              phase === 'revealing' ? 'bg-violet-50' : 'bg-slate-50'
+              phase === "revealing" ? "bg-violet-50" : "bg-slate-50"
             }`}
           >
             <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
-              {phase === 'revealing' ? 'Shown' : 'Matched'}
+              {phase === "revealing" ? "Shown" : "Matched"}
             </span>
             <span
               className={`text-lg font-bold ${
-                phase === 'revealing' ? 'text-violet-600' : phase === 'lost' ? 'text-red-500' : 'text-slate-700'
+                phase === "revealing" ? "text-violet-600" : phase === "lost" ? "text-red-500" : "text-slate-700"
               }`}
             >
-              {phase === 'revealing' ? `${revealProgress[0]}/${revealProgress[1]}` : `${matches}/${TOTAL_PAIRS}`}
+              {phase === "revealing" ? `${revealProgress[0]}/${revealProgress[1]}` : `${matches}/${TOTAL_PAIRS}`}
             </span>
           </div>
         </div>
@@ -507,13 +507,13 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
         <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
           <div
             className={`h-full rounded-full transition-all duration-300 ${
-              phase === 'lost'
-                ? 'bg-linear-to-r from-red-400 to-rose-400'
-                : 'bg-linear-to-r from-violet-500 to-purple-500'
+              phase === "lost"
+                ? "bg-linear-to-r from-red-400 to-rose-400"
+                : "bg-linear-to-r from-violet-500 to-purple-500"
             }`}
             style={{
               width:
-                phase === 'revealing'
+                phase === "revealing"
                   ? `${revealProgress[1] > 0 ? (revealProgress[0] / revealProgress[1]) * 100 : 0}%`
                   : `${(matches / TOTAL_PAIRS) * 100}%`,
             }}
@@ -529,25 +529,25 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
             card={card}
             handleChoice={handleChoice}
             flipped={isFlipped(card)}
-            disabled={disabled || phase !== 'playing'}
+            disabled={disabled || phase !== "playing"}
             isWrong={wrongCards.includes(card.id)}
-            isActiveReveal={phase === 'revealing' && card.id === activeRevealCardId}
+            isActiveReveal={phase === "revealing" && card.id === activeRevealCardId}
           />
         ))}
       </div>
 
       {/* Start button — always rendered to reserve space, invisible when not needed */}
       <button
-        onClick={phase === 'ready' ? beginReveal : undefined}
+        onClick={phase === "ready" ? beginReveal : undefined}
         className={`mt-2 w-full max-w-md rounded-xl py-4 font-semibold text-white shadow-lg transition-all hover:opacity-90 active:scale-95 ${
-          phase !== 'ready' ? 'invisible' : ''
+          phase !== "ready" ? "invisible" : ""
         } bg-violet-600 shadow-lg shadow-violet-100`}
       >
         Start
       </button>
 
       {/* Won Modal */}
-      {phase === 'won' && scoreSaved && (
+      {phase === "won" && scoreSaved && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
           <div className="animate-bounce-in w-full max-w-sm rounded-3xl bg-white p-8 text-center shadow-xl">
             <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-yellow-100 text-yellow-500">
@@ -564,7 +564,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
               <div className="rounded-lg bg-green-50 p-3">
                 <div className="text-xs tracking-wider text-slate-400 uppercase">Mode</div>
                 <div className="mt-1 flex items-center justify-center gap-1 text-sm font-bold text-green-600">
-                  {revealMode === 'sequential' ? <ArrowRight className="h-4 w-4" /> : <Shuffle className="h-4 w-4" />}
+                  {revealMode === "sequential" ? <ArrowRight className="h-4 w-4" /> : <Shuffle className="h-4 w-4" />}
                   {modeLabel}
                 </div>
               </div>

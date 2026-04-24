@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { useMutation, useQuery } from 'convex/react';
-import { Check, Loader2, Shield, ShieldOff, Trash2, TriangleAlert, UserCheck, UserX, X } from 'lucide-react';
-import { useState } from 'react';
-import Dialog from './Dialog';
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { Check, Loader2, Shield, ShieldOff, Trash2, TriangleAlert, UserCheck, UserX, X } from "lucide-react";
+import { useState } from "react";
+import Dialog from "./Dialog";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9-]+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type UserRow = {
-  _id: Id<'users'>;
+  _id: Id<"users">;
   username: string | null;
   email: string | null;
   role: string;
@@ -21,7 +21,7 @@ type UserRow = {
 
 interface Props {
   user: UserRow;
-  currentAdminId: Id<'users'>;
+  currentAdminId: Id<"users">;
   onClose: () => void;
 }
 
@@ -32,25 +32,25 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
   const setUserRole = useMutation(api.admin.setUserRole);
   const deleteUser = useMutation(api.admin.deleteUser);
 
-  const [username, setUsername] = useState(user.username ?? '');
-  const [email, setEmail] = useState(user.email ?? '');
+  const [username, setUsername] = useState(user.username ?? "");
+  const [email, setEmail] = useState(user.email ?? "");
 
   const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState('');
+  const [saveError, setSaveError] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [actionError, setActionError] = useState('');
+  const [actionError, setActionError] = useState("");
 
   const isSelf = user._id === currentAdminId;
 
   // --- Username validation ---
   const normalizedUsername = username.trim().toLowerCase();
-  const usernameUnchanged = normalizedUsername === (user.username ?? '');
+  const usernameUnchanged = normalizedUsername === (user.username ?? "");
   const usernameFormatValid =
     normalizedUsername.length >= 3 && normalizedUsername.length <= 20 && USERNAME_REGEX.test(normalizedUsername);
 
   const usernameAvailabilityCheck = useQuery(
     api.userFunctions.checkUsername,
-    !saving && usernameFormatValid && !usernameUnchanged ? { username: normalizedUsername } : 'skip',
+    !saving && usernameFormatValid && !usernameUnchanged ? { username: normalizedUsername } : "skip",
   );
   const usernameAvailable: boolean | null = usernameUnchanged ? true : (usernameAvailabilityCheck?.available ?? null);
   const usernameChecking = !usernameUnchanged && usernameFormatValid && usernameAvailable === null;
@@ -58,12 +58,12 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
 
   // --- Email validation ---
   const normalizedEmail = email.trim().toLowerCase();
-  const emailUnchanged = normalizedEmail === (user.email ?? '');
+  const emailUnchanged = normalizedEmail === (user.email ?? "");
   const emailFormatValid = EMAIL_REGEX.test(normalizedEmail);
 
   const emailAvailabilityCheck = useQuery(
     api.userFunctions.checkEmail,
-    !saving && emailFormatValid && !emailUnchanged ? { email: normalizedEmail } : 'skip',
+    !saving && emailFormatValid && !emailUnchanged ? { email: normalizedEmail } : "skip",
   );
   const emailTaken: boolean | null = emailUnchanged ? false : (emailAvailabilityCheck?.exists ?? null);
   const emailChecking = !emailUnchanged && emailFormatValid && emailTaken === null;
@@ -76,7 +76,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
   async function handleSave() {
     if (!canSave) return;
     setSaving(true);
-    setSaveError('');
+    setSaveError("");
     try {
       if (!usernameUnchanged) {
         await adminUpdateUsername({ userId: user._id, username: normalizedUsername });
@@ -86,36 +86,36 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
       }
       onClose();
     } catch (e: unknown) {
-      setSaveError(e instanceof Error ? e.message : 'Unknown error');
+      setSaveError(e instanceof Error ? e.message : "Unknown error");
       setSaving(false);
     }
   }
 
   async function handleBan(isBanned: boolean) {
-    setActionError('');
+    setActionError("");
     try {
       await setBanStatus({ userId: user._id, isBanned });
     } catch (e: unknown) {
-      setActionError(e instanceof Error ? e.message : 'Unknown error');
+      setActionError(e instanceof Error ? e.message : "Unknown error");
     }
   }
 
-  async function handleRole(role: 'user' | 'admin') {
-    setActionError('');
+  async function handleRole(role: "user" | "admin") {
+    setActionError("");
     try {
       await setUserRole({ userId: user._id, role });
     } catch (e: unknown) {
-      setActionError(e instanceof Error ? e.message : 'Unknown error');
+      setActionError(e instanceof Error ? e.message : "Unknown error");
     }
   }
 
   async function handleDelete() {
-    setActionError('');
+    setActionError("");
     try {
       await deleteUser({ userId: user._id });
       onClose();
     } catch (e: unknown) {
-      setActionError(e instanceof Error ? e.message : 'Unknown error');
+      setActionError(e instanceof Error ? e.message : "Unknown error");
     }
   }
 
@@ -129,7 +129,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
             <input
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+              onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
               maxLength={20}
               className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 pr-9 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
@@ -152,8 +152,8 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
           ) : normalizedUsername.length > 0 && !usernameFormatValid ? (
             <p className="text-xs text-red-500">
               {normalizedUsername.length < 3
-                ? 'At least 3 characters required'
-                : 'Only letters, numbers and hyphens allowed'}
+                ? "At least 3 characters required"
+                : "Only letters, numbers and hyphens allowed"}
             </p>
           ) : (
             <p className="text-xs text-slate-400">3–20 characters · letters, numbers and hyphens</p>
@@ -200,7 +200,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
           disabled={!canSave}
           className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {saving ? 'Saving…' : 'Save Changes'}
+          {saving ? "Saving…" : "Save Changes"}
         </button>
 
         {/* Divider */}
@@ -216,11 +216,11 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
           )}
           <div className="flex flex-wrap items-center gap-2">
             {/* Role toggle */}
-            {user.role === 'admin' ? (
+            {user.role === "admin" ? (
               <button
                 disabled={isSelf}
-                onClick={() => handleRole('user')}
-                title={isSelf ? 'Cannot change your own role' : 'Revoke admin'}
+                onClick={() => handleRole("user")}
+                title={isSelf ? "Cannot change your own role" : "Revoke admin"}
                 className="flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ShieldOff className="h-3.5 w-3.5" />
@@ -228,7 +228,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               </button>
             ) : (
               <button
-                onClick={() => handleRole('admin')}
+                onClick={() => handleRole("admin")}
                 className="flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition-colors hover:bg-blue-100"
               >
                 <Shield className="h-3.5 w-3.5" />
@@ -249,7 +249,7 @@ export default function EditUserDialog({ user, currentAdminId, onClose }: Props)
               <button
                 disabled={isSelf}
                 onClick={() => handleBan(true)}
-                title={isSelf ? 'Cannot ban yourself' : 'Ban user'}
+                title={isSelf ? "Cannot ban yourself" : "Ban user"}
                 className="flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <UserX className="h-3.5 w-3.5" />

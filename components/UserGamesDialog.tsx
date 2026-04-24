@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Id } from '@/convex/_generated/dataModel';
-import { BarChart3 } from 'lucide-react';
-import Dialog from './Dialog';
+import { Id } from "@/convex/_generated/dataModel";
+import { BarChart3 } from "lucide-react";
+import Dialog from "./Dialog";
 
 type UserRow = {
-  _id: Id<'users'>;
+  _id: Id<"users">;
   username: string | null;
   email: string | null;
 };
@@ -13,7 +13,7 @@ type UserRow = {
 interface Props {
   user: UserRow;
   gameStats: {
-    userId: Id<'users'>;
+    userId: Id<"users">;
     totalGames: number;
     averages: {
       score: number;
@@ -37,16 +37,16 @@ function formatTime(totalSeconds: number) {
   const safe = Math.max(0, Math.round(totalSeconds));
   const minutes = Math.floor(safe / 60);
   const seconds = safe % 60;
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
 }
 
-const dateFormatter = new Intl.DateTimeFormat('de-CH', {
-  dateStyle: 'medium',
-  timeStyle: 'short',
+const dateFormatter = new Intl.DateTimeFormat("de-CH", {
+  dateStyle: "medium",
+  timeStyle: "short",
 });
 
 export default function UserGamesDialog({ user, gameStats, onClose }: Props) {
-  const displayName = user.username ?? user.email ?? 'Unknown user';
+  const displayName = user.username ?? user.email ?? "Unknown user";
 
   return (
     <Dialog title={`Games - ${displayName}`} onClose={onClose} panelClassName="max-w-4xl">

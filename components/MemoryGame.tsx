@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useMutation } from 'convex/react';
-import { Gamepad, RefreshCw, Trophy } from 'lucide-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useMutation } from "convex/react";
+import { Gamepad, RefreshCw, Trophy } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 interface CardData {
   id: number;
@@ -19,12 +19,12 @@ interface TurnLogEntry {
   countsInAccuracy: boolean;
   isCorrect: boolean;
   reason:
-    | 'known match'
-    | 'lucky match'
-    | 'missed known partner'
-    | 'chose known non-matching card'
-    | 'ignored known pair'
-    | 'exploration';
+    | "known match"
+    | "lucky match"
+    | "missed known partner"
+    | "chose known non-matching card"
+    | "ignored known pair"
+    | "exploration";
 }
 
 interface CardProps {
@@ -62,15 +62,15 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
         className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-500 transform-3d ${
           flipped
             ? card.matched
-              ? 'transform-[rotateY(180deg)] border-green-400/90'
-              : 'transform-[rotateY(180deg)] border-blue-400/90'
-            : 'border-slate-200 hover:border-blue-300'
+              ? "transform-[rotateY(180deg)] border-green-400/90"
+              : "transform-[rotateY(180deg)] border-blue-400/90"
+            : "border-slate-200 hover:border-blue-300"
         }`}
       >
         {/* Front (Image) - Visible when flipped */}
         <div
           className={`absolute inset-0 flex transform-[rotateY(180deg)] items-center justify-center overflow-hidden rounded-[10px] bg-white backface-hidden ${
-            flipped ? 'opacity-100' : 'opacity-0'
+            flipped ? "opacity-100" : "opacity-0"
           }`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -84,7 +84,7 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
         {/* Back (Cover) - Visible when not flipped */}
         <div
           className={`absolute inset-0 flex items-center justify-center rounded-[10px] bg-slate-100 transition-colors duration-300 backface-hidden ${
-            !flipped ? 'opacity-100' : 'opacity-0'
+            !flipped ? "opacity-100" : "opacity-0"
           }`}
         >
           <Gamepad className="h-10 w-10 text-slate-300 opacity-50" />
@@ -104,7 +104,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [matches, setMatches] = useState(0);
   const [attempts, setAttempts] = useState(0);
   const [turnsLog, setTurnsLog] = useState<TurnLogEntry[]>([]);
-  const [turnFeedback, setTurnFeedback] = useState<{ message: string; type: 'correct' | 'neutral' | 'wrong' } | null>(
+  const [turnFeedback, setTurnFeedback] = useState<{ message: string; type: "correct" | "neutral" | "wrong" } | null>(
     null,
   );
   const feedbackTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -148,9 +148,9 @@ export default function MemoryGame({ title, description }: { title?: string; des
       labels
         .slice(row * 4, row * 4 + 4)
         .map((n) => String(n).padStart(2))
-        .join(' '),
+        .join(" "),
     );
-    if (process.env.NODE_ENV === 'development') console.log('🃏 Solution:\n' + rows.join('\n'));
+    if (process.env.NODE_ENV === "development") console.log("🃏 Solution:\n" + rows.join("\n"));
 
     setChoiceOne(null);
     setChoiceTwo(null);
@@ -208,7 +208,6 @@ export default function MemoryGame({ title, description }: { title?: string; des
   // Comparison logic
   useEffect(() => {
     if (choiceOne && choiceTwo) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisabled(true);
       setAttempts((prev) => prev + 1);
 
@@ -230,25 +229,25 @@ export default function MemoryGame({ title, description }: { title?: string; des
       const isCorrect = isMatch;
 
       // Describe reason for log readability
-      const reason: TurnLogEntry['reason'] = isMatch
+      const reason: TurnLogEntry["reason"] = isMatch
         ? knewPartnerOfOne
-          ? 'known match'
-          : 'lucky match'
+          ? "known match"
+          : "lucky match"
         : knewPartnerOfOne
-          ? 'missed known partner'
+          ? "missed known partner"
           : knewChoiceTwo
-            ? 'chose known non-matching card'
+            ? "chose known non-matching card"
             : ignoredKnownPair
-              ? 'ignored known pair'
-              : 'exploration';
+              ? "ignored known pair"
+              : "exploration";
 
-      const feedbackMap: Record<TurnLogEntry['reason'], { message: string; type: 'correct' | 'neutral' | 'wrong' }> = {
-        'known match': { message: 'Match, you knew where it was.', type: 'correct' },
-        'lucky match': { message: 'Lucky match!', type: 'correct' },
-        'missed known partner': { message: 'You knew the partner but picked something else.', type: 'wrong' },
-        'chose known non-matching card': { message: "You'd seen that card, it didn't match.", type: 'wrong' },
-        'ignored known pair': { message: 'A known pair was available.', type: 'wrong' },
-        'exploration': { message: 'Both cards new.', type: 'neutral' },
+      const feedbackMap: Record<TurnLogEntry["reason"], { message: string; type: "correct" | "neutral" | "wrong" }> = {
+        "known match": { message: "Match, you knew where it was.", type: "correct" },
+        "lucky match": { message: "Lucky match!", type: "correct" },
+        "missed known partner": { message: "You knew the partner but picked something else.", type: "wrong" },
+        "chose known non-matching card": { message: "You'd seen that card, it didn't match.", type: "wrong" },
+        "ignored known pair": { message: "A known pair was available.", type: "wrong" },
+        "exploration": { message: "Both cards new.", type: "neutral" },
       };
       if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
       feedbackKeyRef.current += 1;
@@ -332,7 +331,6 @@ export default function MemoryGame({ title, description }: { title?: string; des
 
   // Start on first load
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     shuffleCards();
   }, []);
 
@@ -365,7 +363,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
               Time
             </span>
             <span className="text-lg font-bold text-slate-700">
-              {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
+              {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
             </span>
           </div>
 
@@ -391,7 +389,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
               {(() => {
                 const c = turnsLog.filter((t) => t.countsInAccuracy);
                 const ok = c.filter((t) => t.isCorrect).length;
-                return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+                return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
               })()}
             </span>
           </div>
@@ -417,11 +415,11 @@ export default function MemoryGame({ title, description }: { title?: string; des
           <p
             key={feedbackKeyRef.current}
             className={`animate-fade-in text-sm font-medium ${
-              turnFeedback.type === 'correct'
-                ? 'text-green-600'
-                : turnFeedback.type === 'wrong'
-                  ? 'text-red-600'
-                  : 'text-slate-500'
+              turnFeedback.type === "correct"
+                ? "text-green-600"
+                : turnFeedback.type === "wrong"
+                  ? "text-red-600"
+                  : "text-slate-500"
             }`}
           >
             {turnFeedback.message}
@@ -446,7 +444,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
               <div className="rounded-lg bg-slate-50 p-3">
                 <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
                 <div className="mt-1 font-bold text-slate-700">
-                  {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, '0')}
+                  {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
                 </div>
               </div>
               <div className="rounded-lg bg-slate-50 p-3">
@@ -455,7 +453,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
                   {(() => {
                     const c = turnsLog.filter((t) => t.countsInAccuracy);
                     const ok = c.filter((t) => t.isCorrect).length;
-                    return c.length === 0 ? '-%' : `${Math.round((ok / c.length) * 100)}%`;
+                    return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
                   })()}
                 </div>
               </div>

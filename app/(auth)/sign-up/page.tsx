@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useAuthActions } from '@convex-dev/auth/react';
-import { useConvexAuth, useQuery } from 'convex/react';
-import { Check, Loader2, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { Check, Loader2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9-]+$/;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -19,9 +19,9 @@ export default function SignUpPage() {
   const { signIn } = useAuthActions();
   const router = useRouter();
   const { isAuthenticated } = useConvexAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [touched, setTouched] = useState({ email: false, password: false });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -29,19 +29,19 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (isAuthenticated && pendingRedirect) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [isAuthenticated, pendingRedirect, router]);
 
   const usernameCheck = useQuery(
     api.userFunctions.checkUsername,
-    !loading && username.trim().length >= 3 && USERNAME_REGEX.test(username.trim()) ? { username } : 'skip',
+    !loading && username.trim().length >= 3 && USERNAME_REGEX.test(username.trim()) ? { username } : "skip",
   );
   const usernameAvailable = usernameCheck?.available ?? null;
 
   const emailCheck = useQuery(
     api.userFunctions.checkEmail,
-    !loading && EMAIL_REGEX.test(email.trim()) ? { email: email.trim() } : 'skip',
+    !loading && EMAIL_REGEX.test(email.trim()) ? { email: email.trim() } : "skip",
   );
   const emailTaken = emailCheck?.exists ?? false;
   const emailValid = EMAIL_REGEX.test(email.trim());
@@ -52,15 +52,15 @@ export default function SignUpPage() {
     setTouched({ email: true, password: true });
     setError(null);
     if (!USERNAME_REGEX.test(username.trim())) {
-      setError('Only letters, numbers and hyphens are allowed in the username.');
+      setError("Only letters, numbers and hyphens are allowed in the username.");
       return;
     }
     if (usernameAvailable === false) {
-      setError('That username is already taken.');
+      setError("That username is already taken.");
       return;
     }
     if (emailTaken) {
-      setError('An account with this email already exists. Please sign in instead.');
+      setError("An account with this email already exists. Please sign in instead.");
       return;
     }
     if (!passwordValid) {
@@ -69,16 +69,16 @@ export default function SignUpPage() {
     }
     setLoading(true);
     try {
-      await signIn('password', { email, password, username, flow: 'signUp' });
+      await signIn("password", { email, password, username, flow: "signUp" });
       setPendingRedirect(true);
       // Keep loading=true; useEffect will navigate once isAuthenticated is confirmed
       return;
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : '';
-      if (msg.includes('Username')) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg.includes("Username")) {
         setError(msg);
       } else {
-        setError('Could not create account. The email may already be in use.');
+        setError("Could not create account. The email may already be in use.");
       }
       setLoading(false);
     }
@@ -111,7 +111,7 @@ export default function SignUpPage() {
                 maxLength={20}
                 value={username}
                 onChange={(e) => {
-                  setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
+                  setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
                 }}
                 className="w-full rounded-md border border-slate-300 px-3 py-2 pr-9 text-sm outline-none focus:border-blue-400"
               />
@@ -164,7 +164,7 @@ export default function SignUpPage() {
               <p className="text-xs text-red-500">Please enter a valid email address.</p>
             ) : touched.email && emailTaken && !loading ? (
               <p className="text-xs text-red-500">
-                Already registered.{' '}
+                Already registered.{" "}
                 <a href="/sign-in" className="underline">
                   Sign in instead?
                 </a>
@@ -200,7 +200,7 @@ export default function SignUpPage() {
               )}
             </div>
             <p
-              className={`text-xs ${touched.password && password.length > 0 && !passwordValid ? 'text-red-500' : 'text-slate-400'}`}
+              className={`text-xs ${touched.password && password.length > 0 && !passwordValid ? "text-red-500" : "text-slate-400"}`}
             >
               At least {PASSWORD_MIN_LENGTH} characters
             </p>
@@ -211,11 +211,11 @@ export default function SignUpPage() {
             disabled={loading || usernameAvailable === false || emailTaken}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Creating account…' : 'Create account'}
+            {loading ? "Creating account…" : "Create account"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-500">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <a href="/sign-in" className="text-blue-600 hover:underline">
             Sign in
           </a>

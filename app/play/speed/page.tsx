@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import SpeedMemoryGame from '@/components/SpeedMemoryGame';
-import { useConvexAuth } from 'convex/react';
+import SpeedMemoryGame from "@/components/SpeedMemoryGame";
+import { useConvexAuth } from "convex/react";
 
 export default function SpeedGamePage() {
   const { isAuthenticated } = useConvexAuth();

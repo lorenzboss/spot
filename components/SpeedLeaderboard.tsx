@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useQuery } from 'convex/react';
-import { ArrowRight, Medal, Shuffle } from 'lucide-react';
+import { api } from "@/convex/_generated/api";
+import { useQuery } from "convex/react";
+import { ArrowRight, Medal, Shuffle } from "lucide-react";
 
 function formatTime(seconds: number) {
-  return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
+  return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
 }
 
 const DIFFICULTY_META: Record<string, { label: string; color: string }> = {
-  easy: { label: 'Easy', color: 'bg-green-100 text-green-700' },
-  medium: { label: 'Medium', color: 'bg-yellow-100 text-yellow-700' },
-  hard: { label: 'Hard', color: 'bg-red-100 text-red-700' },
+  easy: { label: "Easy", color: "bg-green-100 text-green-700" },
+  medium: { label: "Medium", color: "bg-yellow-100 text-yellow-700" },
+  hard: { label: "Hard", color: "bg-red-100 text-red-700" },
 };
 
 export default function SpeedLeaderboard() {
@@ -31,7 +31,7 @@ export default function SpeedLeaderboard() {
       ) : (
         <div className="space-y-1.5 sm:space-y-2">
           {topScores.map((score, index) => {
-            const diff = DIFFICULTY_META[score.difficulty ?? 'easy'];
+            const diff = DIFFICULTY_META[score.difficulty ?? "easy"];
             return (
               <div
                 key={score._id}
@@ -42,12 +42,12 @@ export default function SpeedLeaderboard() {
                   <div
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold sm:h-10 sm:w-10 sm:text-sm ${
                       index === 0
-                        ? 'bg-yellow-200 text-yellow-700'
+                        ? "bg-yellow-200 text-yellow-700"
                         : index === 1
-                          ? 'bg-gray-200 text-gray-700'
+                          ? "bg-gray-200 text-gray-700"
                           : index === 2
-                            ? 'bg-orange-200 text-orange-700'
-                            : 'bg-slate-100 text-slate-600'
+                            ? "bg-orange-200 text-orange-700"
+                            : "bg-slate-100 text-slate-600"
                     }`}
                   >
                     {index + 1}
@@ -55,7 +55,7 @@ export default function SpeedLeaderboard() {
 
                   <div className="min-w-0">
                     <div className="truncate text-sm font-semibold text-slate-700 sm:text-base">
-                      {score.username ?? 'Anonymous'}
+                      {score.username ?? "Anonymous"}
                     </div>
                     <div className="mt-0.5 flex flex-wrap items-center gap-1">
                       {/* Difficulty badge */}
@@ -63,7 +63,7 @@ export default function SpeedLeaderboard() {
                         {diff.label}
                       </span>
                       {/* Reveal mode badge */}
-                      {score.revealMode === 'sequential' ? (
+                      {score.revealMode === "sequential" ? (
                         <span className="flex items-center gap-0.5 rounded bg-violet-50 px-1.5 py-0.5 text-[10px] font-semibold text-violet-600">
                           <ArrowRight className="h-2.5 w-2.5" /> Seq
                         </span>

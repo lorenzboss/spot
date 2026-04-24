@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useAuthActions } from '@convex-dev/auth/react';
-import { useConvexAuth, useQuery } from 'convex/react';
-import { ShieldBan } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { ReactNode } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { ShieldBan } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 
 export default function BannedGuard({ children }: { children: ReactNode }) {
   const { isAuthenticated } = useConvexAuth();
@@ -15,7 +15,7 @@ export default function BannedGuard({ children }: { children: ReactNode }) {
 
   async function handleSignOut() {
     await signOut();
-    router.replace('/');
+    router.replace("/");
   }
 
   if (isAuthenticated && currentUser?.isBanned) {

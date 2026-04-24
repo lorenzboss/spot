@@ -1,6 +1,6 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
-import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 // ─── Save score ───────────────────────────────────────────────────────────────
 
@@ -12,7 +12,7 @@ export const saveGameScore = mutation({
     // Shared
     time: v.number(),
     // Speed mode args
-    gameMode: v.optional(v.union(v.literal('classic'), v.literal('speed'))),
+    gameMode: v.optional(v.union(v.literal("classic"), v.literal("speed"))),
     difficulty: v.optional(v.string()),
     revealMode: v.optional(v.string()),
   },
@@ -20,9 +20,9 @@ export const saveGameScore = mutation({
     const userId = await getAuthUserId(ctx);
     let score: number;
 
-    if (args.gameMode === 'speed') {
+    if (args.gameMode === "speed") {
       // Speed score: 1,000,000 / time, multiplied by difficulty factor
-      const difficultyMultiplier = args.difficulty === 'hard' ? 3 : args.difficulty === 'medium' ? 2 : 1;
+      const difficultyMultiplier = args.difficulty === "hard" ? 3 : args.difficulty === "medium" ? 2 : 1;
       score = Math.round((1_000_000 / Math.max(1, args.time)) * difficultyMultiplier);
     } else {
       // Classic score formula (unchanged)
@@ -34,13 +34,13 @@ export const saveGameScore = mutation({
       );
     }
 
-    await ctx.db.insert('gameScores', {
+    await ctx.db.insert("gameScores", {
       userId: userId ?? undefined,
       turns: args.turns,
       time: args.time,
       accuracy: args.accuracy,
       score,
-      gameMode: args.gameMode ?? 'classic',
+      gameMode: args.gameMode ?? "classic",
       difficulty: args.difficulty,
       revealMode: args.revealMode,
     });
@@ -54,10 +54,10 @@ export const saveGameScore = mutation({
 export const getTopScores = query({
   args: {},
   handler: async (ctx) => {
-    const allScores = await ctx.db.query('gameScores').collect();
+    const allScores = await ctx.db.query("gameScores").collect();
 
     // Classic = gameMode 'classic' OR no gameMode (legacy rows)
-    const classic = allScores.filter((s) => s.gameMode === 'classic' || s.gameMode === undefined);
+    const classic = allScores.filter((s) => s.gameMode === "classic" || s.gameMode === undefined);
 
     // Best score per user
     const bestByUser = new Map<string, (typeof classic)[number]>();
@@ -83,9 +83,9 @@ export const getTopScores = query({
 export const getSpeedTopScores = query({
   args: {},
   handler: async (ctx) => {
-    const allScores = await ctx.db.query('gameScores').collect();
+    const allScores = await ctx.db.query("gameScores").collect();
 
-    const speed = allScores.filter((s) => s.gameMode === 'speed');
+    const speed = allScores.filter((s) => s.gameMode === "speed");
 
     // Best (lowest) time per user × difficulty × revealMode combo
     // We keep one entry per user (overall best time across any combo)

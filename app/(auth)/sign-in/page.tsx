@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { useAuthActions } from '@convex-dev/auth/react';
-import { useConvexAuth } from 'convex/react';
-import { Loader2 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth } from "convex/react";
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function SignInPage() {
   const { signIn } = useAuthActions();
   const router = useRouter();
   const { isAuthenticated } = useConvexAuth();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && pendingRedirect) {
-      router.replace('/');
+      router.replace("/");
     }
   }, [isAuthenticated, pendingRedirect, router]);
 
@@ -35,11 +35,11 @@ export default function SignInPage() {
     setError(null);
     setLoading(true);
     try {
-      await signIn('password', { email, password, flow: 'signIn' });
+      await signIn("password", { email, password, flow: "signIn" });
       setPendingRedirect(true);
       return;
     } catch {
-      setError('Invalid email or password.');
+      setError("Invalid email or password.");
       setLoading(false);
     }
   }
@@ -83,11 +83,11 @@ export default function SignInPage() {
             disabled={loading}
             className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
         <p className="mt-4 text-center text-sm text-slate-500">
-          No account?{' '}
+          No account?{" "}
           <a href="/sign-up" className="text-blue-600 hover:underline">
             Sign up
           </a>

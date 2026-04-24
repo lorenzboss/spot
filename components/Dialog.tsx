@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { X } from 'lucide-react';
-import { ReactNode, useEffect } from 'react';
+import { X } from "lucide-react";
+import { ReactNode, useEffect } from "react";
 
 interface DialogProps {
   title: string;
@@ -14,10 +14,10 @@ export default function Dialog({ title, onClose, children, panelClassName }: Dia
   // Close on Escape
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     }
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
   return (
@@ -26,7 +26,7 @@ export default function Dialog({ title, onClose, children, panelClassName }: Dia
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
-        className={`w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-xl ${panelClassName ?? 'max-w-sm'}`}
+        className={`w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-xl ${panelClassName ?? "max-w-sm"}`}
       >
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-base font-semibold">{title}</h2>

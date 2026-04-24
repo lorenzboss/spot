@@ -1,6 +1,6 @@
-import { getAuthUserId } from '@convex-dev/auth/server';
-import { v } from 'convex/values';
-import { mutation, query } from './_generated/server';
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 // Get the currently logged-in user document
 export const getCurrentUser = query({
@@ -18,8 +18,8 @@ export const checkEmail = query({
   handler: async (ctx, args) => {
     const normalized = args.email.trim().toLowerCase();
     const existing = await ctx.db
-      .query('authAccounts')
-      .withIndex('providerAndAccountId', (q) => q.eq('provider', 'password').eq('providerAccountId', normalized))
+      .query("authAccounts")
+      .withIndex("providerAndAccountId", (q) => q.eq("provider", "password").eq("providerAccountId", normalized))
       .first();
     return { exists: existing !== null };
   },
@@ -32,8 +32,8 @@ export const checkUsername = query({
     const normalized = args.username.trim().toLowerCase();
     if (!normalized) return { available: false };
     const existing = await ctx.db
-      .query('users')
-      .withIndex('by_username', (q) => q.eq('username', normalized))
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", normalized))
       .first();
     return { available: existing === null };
   },
@@ -44,15 +44,15 @@ export const updateUsername = mutation({
   args: { username: v.string() },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
-    if (!userId) throw new Error('Not authenticated');
+    if (!userId) throw new Error("Not authenticated");
     const normalized = args.username.trim().toLowerCase();
-    if (!normalized) throw new Error('Username cannot be empty');
-    if (!/^[a-zA-Z0-9-]+$/.test(normalized)) throw new Error('Username contains invalid characters');
+    if (!normalized) throw new Error("Username cannot be empty");
+    if (!/^[a-zA-Z0-9-]+$/.test(normalized)) throw new Error("Username contains invalid characters");
     const existing = await ctx.db
-      .query('users')
-      .withIndex('by_username', (q) => q.eq('username', normalized))
+      .query("users")
+      .withIndex("by_username", (q) => q.eq("username", normalized))
       .first();
-    if (existing && existing._id !== userId) throw new Error('Username already taken');
+    if (existing && existing._id !== userId) throw new Error("Username already taken");
     await ctx.db.patch(userId, { username: normalized });
   },
 });
@@ -72,14 +72,14 @@ export const getMyGameStats = query({
     if (!userId) return null;
 
     const games = await ctx.db
-      .query('gameScores')
-      .filter((q) => q.eq(q.field('userId'), userId))
+      .query("gameScores")
+      .filter((q) => q.eq(q.field("userId"), userId))
       .collect();
 
     const sortedGames = games.sort((a, b) => b._creationTime - a._creationTime);
 
     // ── Classic ──────────────────────────────────────────────────────────────
-    const classicGames = sortedGames.filter((g) => g.gameMode === 'classic' || g.gameMode === undefined);
+    const classicGames = sortedGames.filter((g) => g.gameMode === "classic" || g.gameMode === undefined);
     const classicTotals = classicGames.reduce(
       (acc, g) => {
         acc.score += g.score;
@@ -96,7 +96,7 @@ export const getMyGameStats = query({
     }, null);
 
     // ── Speed ────────────────────────────────────────────────────────────────
-    const speedGames = sortedGames.filter((g) => g.gameMode === 'speed');
+    const speedGames = sortedGames.filter((g) => g.gameMode === "speed");
     const speedTotals = speedGames.reduce(
       (acc, g) => {
         acc.score += g.score;
@@ -157,8 +157,8 @@ export const getMyGameStats = query({
           _id: g._id,
           score: g.score,
           time: g.time,
-          difficulty: g.difficulty ?? 'easy',
-          revealMode: g.revealMode ?? 'sequential',
+          difficulty: g.difficulty ?? "easy",
+          revealMode: g.revealMode ?? "sequential",
           playedAt: g._creationTime,
         })),
       },

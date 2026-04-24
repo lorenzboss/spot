@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useAuthActions } from '@convex-dev/auth/react';
-import { useConvexAuth, useMutation, useQuery } from 'convex/react';
-import { Check, Loader2, ShieldBan, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth, useMutation, useQuery } from "convex/react";
+import { Check, Loader2, ShieldBan, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 const USERNAME_REGEX = /^[a-zA-Z0-9-]+$/;
 
@@ -18,18 +18,18 @@ export default function SettingsPage() {
 
   const [usernameDraft, setUsernameDraft] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [saveError, setSaveError] = useState('');
-  const username = usernameDraft ?? currentUser?.username ?? '';
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+  const [saveError, setSaveError] = useState("");
+  const username = usernameDraft ?? currentUser?.username ?? "";
 
   async function handleSignOut() {
     await signOut();
-    router.replace('/');
+    router.replace("/");
   }
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace('/sign-in');
+      router.replace("/sign-in");
     }
   }, [isAuthenticated, isLoading, router]);
 
@@ -94,14 +94,14 @@ function SettingsForm({
   setUsername: (v: string) => void;
   saving: boolean;
   setSaving: (v: boolean) => void;
-  saveStatus: 'idle' | 'success' | 'error';
-  setSaveStatus: (v: 'idle' | 'success' | 'error') => void;
+  saveStatus: "idle" | "success" | "error";
+  setSaveStatus: (v: "idle" | "success" | "error") => void;
   saveError: string;
   setSaveError: (v: string) => void;
   updateUsername: ReturnType<typeof useMutation<typeof api.userFunctions.updateUsername>>;
 }) {
   const normalized = username.trim().toLowerCase();
-  const isUnchanged = normalized === (currentUser?.username ?? '');
+  const isUnchanged = normalized === (currentUser?.username ?? "");
   const isFormatValid = normalized.length >= 3 && normalized.length <= 20 && USERNAME_REGEX.test(normalized);
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -118,7 +118,7 @@ function SettingsForm({
 
   const availabilityCheck = useQuery(
     api.userFunctions.checkUsername,
-    !saving && isFormatValid && !isUnchanged ? { username: normalized } : 'skip',
+    !saving && isFormatValid && !isUnchanged ? { username: normalized } : "skip",
   );
   const available: boolean | null = isUnchanged ? true : (availabilityCheck?.available ?? null);
 
@@ -130,15 +130,15 @@ function SettingsForm({
     e.preventDefault();
     if (!canSave) return;
     setSaving(true);
-    setSaveError('');
-    setSaveStatus('idle');
+    setSaveError("");
+    setSaveStatus("idle");
     try {
       await updateUsername({ username: normalized });
-      setSaveStatus('success');
-      setTimeout(() => setSaveStatus('idle'), 2500);
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 2500);
     } catch (err: unknown) {
-      setSaveError(err instanceof Error ? err.message : 'Something went wrong');
-      setSaveStatus('error');
+      setSaveError(err instanceof Error ? err.message : "Something went wrong");
+      setSaveStatus("error");
     } finally {
       setSaving(false);
     }
@@ -161,9 +161,9 @@ function SettingsForm({
                   value={username}
                   autoComplete="off"
                   onChange={(e) => {
-                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''));
-                    setSaveStatus('idle');
-                    setSaveError('');
+                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""));
+                    setSaveStatus("idle");
+                    setSaveError("");
                   }}
                   maxLength={20}
                   placeholder="your-username"
@@ -188,25 +188,25 @@ function SettingsForm({
               ) : normalized.length > 0 && !isFormatValid ? (
                 <p className="text-xs text-red-500">
                   {normalized.length < 3
-                    ? 'At least 3 characters required'
+                    ? "At least 3 characters required"
                     : normalized.length > 20
-                      ? 'Maximum 20 characters'
-                      : 'Only letters, numbers and hyphens allowed'}
+                      ? "Maximum 20 characters"
+                      : "Only letters, numbers and hyphens allowed"}
                 </p>
               ) : (
                 <p className="text-xs text-slate-400">3-20 characters · letters, numbers and hyphens</p>
               )}
             </div>
 
-            {saveStatus === 'error' && <p className="text-sm text-red-600">{saveError}</p>}
-            {saveStatus === 'success' && <p className="text-sm text-green-600">Username updated!</p>}
+            {saveStatus === "error" && <p className="text-sm text-red-600">{saveError}</p>}
+            {saveStatus === "success" && <p className="text-sm text-green-600">Username updated!</p>}
 
             <button
               type="submit"
               disabled={!canSave}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {saving ? 'Saving…' : 'Save Changes'}
+              {saving ? "Saving…" : "Save Changes"}
             </button>
           </form>
         </div>
@@ -214,12 +214,12 @@ function SettingsForm({
         <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <h2 className="mb-2 text-base font-semibold">Account Info</h2>
           <p className="text-sm text-slate-500">
-            <span className="font-medium text-slate-700">E-Mail:</span> {currentUser?.email ?? '—'}
+            <span className="font-medium text-slate-700">E-Mail:</span> {currentUser?.email ?? "—"}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            <span className="font-medium text-slate-700">Role:</span>{' '}
-            <span className={currentUser?.role === 'admin' ? 'font-semibold text-blue-600' : 'text-slate-600'}>
-              {currentUser?.role ?? 'user'}
+            <span className="font-medium text-slate-700">Role:</span>{" "}
+            <span className={currentUser?.role === "admin" ? "font-semibold text-blue-600" : "text-slate-600"}>
+              {currentUser?.role ?? "user"}
             </span>
           </p>
         </div>

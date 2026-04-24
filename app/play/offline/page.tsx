@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import MemoryGame from '@/components/MemoryGame';
-import { useConvexAuth } from 'convex/react';
+import MemoryGame from "@/components/MemoryGame";
+import { useConvexAuth } from "convex/react";
 
 export default function OfflineGamePage() {
   const { isAuthenticated } = useConvexAuth();
