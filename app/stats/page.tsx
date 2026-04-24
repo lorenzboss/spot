@@ -38,7 +38,7 @@ function StatCell({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5 p-4">
       <span className="text-xs font-semibold tracking-wide text-slate-400 uppercase">{label}</span>
-      <span className="mt-0.5 text-xl font-semibold tabular-nums text-slate-800">{value}</span>
+      <span className="mt-0.5 text-xl font-semibold text-slate-800 tabular-nums">{value}</span>
     </div>
   );
 }
@@ -82,9 +82,7 @@ function ClassicTable({ games }: { games: ClassicRow[] }) {
         id: 'index',
         header: () => <span>#</span>,
         enableSorting: false,
-        cell: ({ row }) => (
-          <span className="font-mono text-slate-400 tabular-nums">{row.index + 1}</span>
-        ),
+        cell: ({ row }) => <span className="font-mono text-slate-400 tabular-nums">{row.index + 1}</span>,
       },
       {
         accessorKey: 'score',
@@ -98,33 +96,25 @@ function ClassicTable({ games }: { games: ClassicRow[] }) {
       {
         accessorKey: 'turns',
         header: 'Turns',
-        cell: ({ getValue }) => (
-          <span className="font-mono text-slate-700 tabular-nums">{getValue<number>()}</span>
-        ),
+        cell: ({ getValue }) => <span className="font-mono text-slate-700 tabular-nums">{getValue<number>()}</span>,
       },
       {
         accessorKey: 'time',
         header: 'Time',
         cell: ({ getValue }) => (
-          <span className="font-mono text-slate-700 tabular-nums">
-            {formatTime(getValue<number>())}
-          </span>
+          <span className="font-mono text-slate-700 tabular-nums">{formatTime(getValue<number>())}</span>
         ),
       },
       {
         accessorKey: 'accuracy',
         header: 'Accuracy',
-        cell: ({ getValue }) => (
-          <span className="font-mono text-slate-700 tabular-nums">{getValue<number>()}%</span>
-        ),
+        cell: ({ getValue }) => <span className="font-mono text-slate-700 tabular-nums">{getValue<number>()}%</span>,
       },
       {
         accessorKey: 'playedAt',
         header: 'Played',
         cell: ({ getValue }) => (
-          <span className="whitespace-nowrap text-slate-500">
-            {dateFormatter.format(getValue<number>())}
-          </span>
+          <span className="whitespace-nowrap text-slate-500">{dateFormatter.format(getValue<number>())}</span>
         ),
       },
     ],
@@ -161,9 +151,7 @@ function SpeedTable({ games }: { games: SpeedRow[] }) {
         id: 'index',
         header: () => <span>#</span>,
         enableSorting: false,
-        cell: ({ row }) => (
-          <span className="font-mono text-slate-400 tabular-nums">{row.index + 1}</span>
-        ),
+        cell: ({ row }) => <span className="font-mono text-slate-400 tabular-nums">{row.index + 1}</span>,
       },
       {
         accessorKey: 'score',
@@ -178,9 +166,7 @@ function SpeedTable({ games }: { games: SpeedRow[] }) {
         accessorKey: 'time',
         header: 'Time',
         cell: ({ getValue }) => (
-          <span className="font-mono text-slate-700 tabular-nums">
-            {formatTime(getValue<number>())}
-          </span>
+          <span className="font-mono text-slate-700 tabular-nums">{formatTime(getValue<number>())}</span>
         ),
       },
       {
@@ -221,9 +207,7 @@ function SpeedTable({ games }: { games: SpeedRow[] }) {
         accessorKey: 'playedAt',
         header: 'Played',
         cell: ({ getValue }) => (
-          <span className="whitespace-nowrap text-slate-500">
-            {dateFormatter.format(getValue<number>())}
-          </span>
+          <span className="whitespace-nowrap text-slate-500">{dateFormatter.format(getValue<number>())}</span>
         ),
       },
     ],
@@ -256,7 +240,7 @@ function SortableTable({ table, columns, countLabel }: { table: any; columns: an
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-end">
-        <span className="text-sm mr-2 text-slate-500">{countLabel}</span>
+        <span className="mr-2 text-sm text-slate-500">{countLabel}</span>
       </div>
       <div
         className="min-w-0 overflow-x-auto overflow-y-hidden overscroll-x-contain rounded-2xl border border-slate-200 bg-white shadow-sm"
@@ -352,16 +336,10 @@ export default function StatsPage() {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-              activeTab === tab
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+              activeTab === tab ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            {tab === 'classic' ? (
-              <RotateCcw className="h-4 w-4" />
-            ) : (
-              <Zap className="h-4 w-4" />
-            )}
+            {tab === 'classic' ? <RotateCcw className="h-4 w-4" /> : <Zap className="h-4 w-4" />}
             {capitalize(tab)} Mode
           </button>
         ))}
@@ -384,10 +362,7 @@ export default function StatsPage() {
                 <div className="grid grid-cols-2 divide-x divide-y divide-slate-100 sm:grid-cols-4">
                   <StatCell label="Highscore" value={classic.highscore?.toLocaleString() ?? '—'} />
                   <StatCell label="Best turns" value={classic.bestTurns ?? '—'} />
-                  <StatCell
-                    label="Best time"
-                    value={classic.bestTime != null ? formatTime(classic.bestTime) : '—'}
-                  />
+                  <StatCell label="Best time" value={classic.bestTime != null ? formatTime(classic.bestTime) : '—'} />
                   <StatCell
                     label="Best accuracy"
                     value={classic.bestAccuracy != null ? `${classic.bestAccuracy.toFixed(1)}%` : '—'}
@@ -396,14 +371,8 @@ export default function StatsPage() {
                     label="Avg score"
                     value={classic.averages ? Math.round(classic.averages.score).toLocaleString() : '—'}
                   />
-                  <StatCell
-                    label="Avg turns"
-                    value={classic.averages ? classic.averages.turns.toFixed(1) : '—'}
-                  />
-                  <StatCell
-                    label="Avg time"
-                    value={classic.averages ? formatTime(classic.averages.time) : '—'}
-                  />
+                  <StatCell label="Avg turns" value={classic.averages ? classic.averages.turns.toFixed(1) : '—'} />
+                  <StatCell label="Avg time" value={classic.averages ? formatTime(classic.averages.time) : '—'} />
                   <StatCell
                     label="Avg accuracy"
                     value={classic.averages ? `${classic.averages.accuracy.toFixed(1)}%` : '—'}
@@ -434,10 +403,7 @@ export default function StatsPage() {
                 </div>
                 <div className="grid grid-cols-2 divide-x divide-y divide-slate-100 sm:grid-cols-3">
                   <StatCell label="Highscore" value={speed.highscore?.toLocaleString() ?? '—'} />
-                  <StatCell
-                    label="Best time"
-                    value={speed.bestTime != null ? formatTime(speed.bestTime) : '—'}
-                  />
+                  <StatCell label="Best time" value={speed.bestTime != null ? formatTime(speed.bestTime) : '—'} />
                   <StatCell
                     label="Best difficulty"
                     value={speed.bestDifficulty ? capitalize(speed.bestDifficulty) : '—'}
@@ -450,10 +416,7 @@ export default function StatsPage() {
                     label="Avg score"
                     value={speed.averages ? Math.round(speed.averages.score).toLocaleString() : '—'}
                   />
-                  <StatCell
-                    label="Avg time"
-                    value={speed.averages ? formatTime(speed.averages.time) : '—'}
-                  />
+                  <StatCell label="Avg time" value={speed.averages ? formatTime(speed.averages.time) : '—'} />
                 </div>
               </div>
 

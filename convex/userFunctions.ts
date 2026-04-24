@@ -79,9 +79,7 @@ export const getMyGameStats = query({
     const sortedGames = games.sort((a, b) => b._creationTime - a._creationTime);
 
     // ── Classic ──────────────────────────────────────────────────────────────
-    const classicGames = sortedGames.filter(
-      (g) => g.gameMode === 'classic' || g.gameMode === undefined,
-    );
+    const classicGames = sortedGames.filter((g) => g.gameMode === 'classic' || g.gameMode === undefined);
     const classicTotals = classicGames.reduce(
       (acc, g) => {
         acc.score += g.score;
@@ -92,7 +90,7 @@ export const getMyGameStats = query({
       },
       { score: 0, turns: 0, time: 0, accuracy: 0 },
     );
-    const classicBest = classicGames.reduce<typeof classicGames[number] | null>((best, g) => {
+    const classicBest = classicGames.reduce<(typeof classicGames)[number] | null>((best, g) => {
       if (!best || g.score > best.score) return g;
       return best;
     }, null);
@@ -107,7 +105,7 @@ export const getMyGameStats = query({
       },
       { score: 0, time: 0 },
     );
-    const speedBest = speedGames.reduce<typeof speedGames[number] | null>((best, g) => {
+    const speedBest = speedGames.reduce<(typeof speedGames)[number] | null>((best, g) => {
       // Best speed = highest score (score already reflects difficulty)
       if (!best || g.score > best.score) return g;
       return best;

@@ -9,9 +9,9 @@ function formatTime(seconds: number) {
 }
 
 const DIFFICULTY_META: Record<string, { label: string; color: string }> = {
-  easy:   { label: 'Easy',   color: 'bg-green-100 text-green-700' },
+  easy: { label: 'Easy', color: 'bg-green-100 text-green-700' },
   medium: { label: 'Medium', color: 'bg-yellow-100 text-yellow-700' },
-  hard:   { label: 'Hard',   color: 'bg-red-100 text-red-700' },
+  hard: { label: 'Hard', color: 'bg-red-100 text-red-700' },
 };
 
 export default function SpeedLeaderboard() {
@@ -27,9 +27,7 @@ export default function SpeedLeaderboard() {
       </div>
 
       {empty ? (
-        <p className="text-center text-sm text-slate-500 sm:text-base">
-          No speed games finished yet. Be the first!
-        </p>
+        <p className="text-center text-sm text-slate-500 sm:text-base">No speed games finished yet. Be the first!</p>
       ) : (
         <div className="space-y-1.5 sm:space-y-2">
           {topScores.map((score, index) => {
@@ -80,7 +78,7 @@ export default function SpeedLeaderboard() {
 
                 {/* Time */}
                 <div className="text-right">
-                  <div className="text-base font-bold leading-none text-violet-600 sm:text-lg">
+                  <div className="text-base leading-none font-bold text-violet-600 sm:text-lg">
                     {formatTime(score.time)}
                   </div>
                   <div className="text-[10px] text-slate-500 sm:text-xs">time</div>

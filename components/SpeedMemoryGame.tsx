@@ -18,16 +18,16 @@ type RevealMode = 'sequential' | 'random';
 type Difficulty = 'easy' | 'medium' | 'hard';
 
 const DIFFICULTY_SHOW_MS: Record<Difficulty, number> = {
-  easy:   3000,
+  easy: 3000,
   medium: 1500,
-  hard:   700,
+  hard: 700,
 };
 
 type GamePhase =
-  | 'select'    // choosing sub-mode
-  | 'ready'     // cards generated, waiting for user to press Start
+  | 'select' // choosing sub-mode
+  | 'ready' // cards generated, waiting for user to press Start
   | 'revealing' // one card at a time being shown
-  | 'playing'   // player picks pairs
+  | 'playing' // player picks pairs
   | 'lost'
   | 'won';
 
@@ -162,9 +162,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
     (mode: RevealMode, diff: Difficulty) => {
       revealGeneration.current += 1;
       const newCards = buildCards();
-      const order = mode === 'sequential'
-        ? newCards.map((c) => c.id)
-        : shuffleArray(newCards.map((c) => c.id));
+      const order = mode === 'sequential' ? newCards.map((c) => c.id) : shuffleArray(newCards.map((c) => c.id));
 
       router.replace(`?mode=${mode}&difficulty=${diff}`, { scroll: false });
 
@@ -219,8 +217,7 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
   useEffect(() => {
     const modeParam = searchParams.get('mode');
     const diffParam = searchParams.get('difficulty');
-    const diff: Difficulty =
-      diffParam === 'medium' ? 'medium' : diffParam === 'hard' ? 'hard' : 'easy';
+    const diff: Difficulty = diffParam === 'medium' ? 'medium' : diffParam === 'hard' ? 'hard' : 'easy';
     if (modeParam === 'sequential' || modeParam === 'random') {
       startGame(modeParam, diff);
     }
@@ -357,9 +354,9 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           <div className="mb-6 flex gap-2">
             {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => {
               const meta = {
-                easy:   { label: 'Easy',   ms: '3s',    color: 'green'  },
-                medium: { label: 'Medium', ms: '1.5s',  color: 'yellow' },
-                hard:   { label: 'Hard',   ms: '0.7s',  color: 'red'    },
+                easy: { label: 'Easy', ms: '3s', color: 'green' },
+                medium: { label: 'Medium', ms: '1.5s', color: 'yellow' },
+                hard: { label: 'Hard', ms: '0.7s', color: 'red' },
               }[d];
               const active = difficulty === d;
               return (
@@ -417,8 +414,8 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
 
           <div className="mt-6 rounded-xl bg-slate-50 p-3 text-xs text-slate-500">
             <span className="font-semibold text-slate-600">Rules: </span>
-            Watch every card carefully. After all cards have been shown, find all pairs from memory.
-            One wrong click and you lose immediately!
+            Watch every card carefully. After all cards have been shown, find all pairs from memory. One wrong click and
+            you lose immediately!
           </div>
         </div>
       </div>
@@ -444,11 +441,15 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
                 <Shuffle className="h-3.5 w-3.5 text-violet-500" />
               )}
               <span className="text-xs font-medium text-slate-400">{modeLabel} mode</span>
-              <span className={`ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                difficulty === 'easy' ? 'bg-green-100 text-green-700' :
-                difficulty === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                'bg-red-100 text-red-700'
-              }`}>
+              <span
+                className={`ml-1 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                  difficulty === 'easy'
+                    ? 'bg-green-100 text-green-700'
+                    : difficulty === 'medium'
+                      ? 'bg-yellow-100 text-yellow-700'
+                      : 'bg-red-100 text-red-700'
+                }`}
+              >
                 {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
               </span>
             </div>
@@ -480,7 +481,9 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           </div>
           <div className="rounded-lg bg-slate-50 p-2 text-center">
             <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase">Matches</span>
-            <span className="text-lg font-bold text-slate-700">{matches}/{TOTAL_PAIRS}</span>
+            <span className="text-lg font-bold text-slate-700">
+              {matches}/{TOTAL_PAIRS}
+            </span>
           </div>
           <div
             className={`rounded-lg p-2 text-center transition-colors ${
@@ -492,16 +495,10 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
             </span>
             <span
               className={`text-lg font-bold ${
-                phase === 'revealing'
-                  ? 'text-violet-600'
-                  : phase === 'lost'
-                    ? 'text-red-500'
-                    : 'text-slate-700'
+                phase === 'revealing' ? 'text-violet-600' : phase === 'lost' ? 'text-red-500' : 'text-slate-700'
               }`}
             >
-              {phase === 'revealing'
-                ? `${revealProgress[0]}/${revealProgress[1]}`
-                : `${matches}/${TOTAL_PAIRS}`}
+              {phase === 'revealing' ? `${revealProgress[0]}/${revealProgress[1]}` : `${matches}/${TOTAL_PAIRS}`}
             </span>
           </div>
         </div>
@@ -596,7 +593,6 @@ export default function SpeedMemoryGame({ title, description }: { title?: string
           </div>
         </div>
       )}
-
 
       <style>{`
         @keyframes bounceIn {

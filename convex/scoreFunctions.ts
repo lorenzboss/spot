@@ -22,8 +22,7 @@ export const saveGameScore = mutation({
 
     if (args.gameMode === 'speed') {
       // Speed score: 1,000,000 / time, multiplied by difficulty factor
-      const difficultyMultiplier =
-        args.difficulty === 'hard' ? 3 : args.difficulty === 'medium' ? 2 : 1;
+      const difficultyMultiplier = args.difficulty === 'hard' ? 3 : args.difficulty === 'medium' ? 2 : 1;
       score = Math.round((1_000_000 / Math.max(1, args.time)) * difficultyMultiplier);
     } else {
       // Classic score formula (unchanged)
@@ -31,8 +30,7 @@ export const saveGameScore = mutation({
       const accuracy = args.accuracy ?? 100;
       const accuracyMultiplier = Math.pow(accuracy / 100, 1.5);
       score = Math.round(
-        (10_000_000 / (Math.pow(turns, 1.5) * Math.sqrt(Math.max(1, args.time)))) *
-          accuracyMultiplier,
+        (10_000_000 / (Math.pow(turns, 1.5) * Math.sqrt(Math.max(1, args.time)))) * accuracyMultiplier,
       );
     }
 
@@ -59,9 +57,7 @@ export const getTopScores = query({
     const allScores = await ctx.db.query('gameScores').collect();
 
     // Classic = gameMode 'classic' OR no gameMode (legacy rows)
-    const classic = allScores.filter(
-      (s) => s.gameMode === 'classic' || s.gameMode === undefined,
-    );
+    const classic = allScores.filter((s) => s.gameMode === 'classic' || s.gameMode === undefined);
 
     // Best score per user
     const bestByUser = new Map<string, (typeof classic)[number]>();

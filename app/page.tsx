@@ -103,9 +103,7 @@ function Content() {
           <button
             onClick={() => setActiveBoard('classic')}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
-              activeBoard === 'classic'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+              activeBoard === 'classic' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             <Gamepad2 className="h-4 w-4" />
@@ -114,9 +112,7 @@ function Content() {
           <button
             onClick={() => setActiveBoard('speed')}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg py-2 text-sm font-medium transition-all ${
-              activeBoard === 'speed'
-                ? 'bg-white text-slate-800 shadow-sm'
-                : 'text-slate-500 hover:text-slate-700'
+              activeBoard === 'speed' ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
             <Zap className="h-4 w-4" />

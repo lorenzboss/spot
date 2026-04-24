@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import { api } from '@/convex/_generated/api';
-import { useAuthActions } from '@convex-dev/auth/react';
-import { useConvexAuth, useQuery } from 'convex/react';
-import { BarChart3, Gamepad2, LogOut, Settings, UsersRound } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { api } from "@/convex/_generated/api";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { useConvexAuth, useQuery } from "convex/react";
+import { BarChart3, Gamepad2, LogOut, Settings, UsersRound } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const TEN_MINUTES_MS = 10 * 60 * 1000;
 
-const MORNING_GREETINGS = ['Good morning, %s', 'Morning, %s', 'Hey there, %s', 'Ready to play, %s?'];
-const MIDDAY_GREETINGS = ['Hello, %s', 'Hi there, %s', 'Good day, %s', 'Hey, %s', 'How are you, %s?'];
-const AFTERNOON_GREETINGS = ['Good afternoon, %s', 'Hi again, %s', 'Welcome back, %s', 'All good, %s?'];
-const EVENING_GREETINGS = ['Good evening, %s', 'Evening, %s', 'How was your day, %s?', 'Nice to see you, %s'];
-const NIGHT_GREETINGS = ['Good night, %s', 'Still up, %s?', 'Late hello, %s', 'One more game, %s?', 'Long day, %s?'];
+const MORNING_GREETINGS = ["Good morning, %s", "Morning, %s", "Hey there, %s", "Ready to play, %s?"];
+const MIDDAY_GREETINGS = ["Hello, %s", "Hi there, %s", "Good day, %s", "Hey, %s", "How are you, %s?"];
+const AFTERNOON_GREETINGS = ["Good afternoon, %s", "Hi again, %s", "Welcome back, %s", "All good, %s?"];
+const EVENING_GREETINGS = ["Good evening, %s", "Evening, %s", "How was your day, %s?", "Nice to see you, %s"];
+const NIGHT_GREETINGS = ["Good night, %s", "Still up, %s?", "Late hello, %s", "One more game, %s?", "Long day, %s?"];
 
 function formatGreeting(template: string, username: string) {
-  return template.replace('%s', username);
+  return template.replace("%s", username);
 }
 
 function getGreetingByLocalTime(date: Date) {
@@ -43,7 +43,7 @@ export default function Header() {
 
   async function handleSignOut() {
     await signOut();
-    router.replace('/');
+    router.replace("/");
   }
 
   return (
@@ -59,33 +59,17 @@ export default function Header() {
                 {formatGreeting(greetingTemplate, currentUser.username)}
               </span>
             )}
-            <Link
-              href="/"
-              title="Home"
-              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
-            >
+            <Link href="/" title="Home" className="rounded-md p-1.5 transition-colors hover:bg-blue-50">
               <Gamepad2 className="size-5" />
             </Link>
-            <Link
-              href="/stats"
-              title="My Stats"
-              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
-            >
+            <Link href="/stats" title="My Stats" className="rounded-md p-1.5 transition-colors hover:bg-blue-50">
               <BarChart3 className="size-4.5" />
             </Link>
-            <Link
-              href="/settings"
-              title="Settings"
-              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 "
-            >
+            <Link href="/settings" title="Settings" className="rounded-md p-1.5 transition-colors hover:bg-blue-50">
               <Settings className="size-4.5" />
             </Link>
-             {currentUser?.role === 'admin' && (
-              <Link
-                href="/admin"
-                title="Admin Panel"
-                className="rounded-md p-1.5 transition-colors hover:bg-blue-50"
-              >
+            {currentUser?.role === "admin" && (
+              <Link href="/admin" title="Admin Panel" className="rounded-md p-1.5 transition-colors hover:bg-blue-50">
                 <UsersRound className="size-4.5" />
               </Link>
             )}
@@ -93,7 +77,7 @@ export default function Header() {
               onClick={() => void handleSignOut()}
               title="Sign out"
               aria-label="Sign out"
-              className="rounded-md p-1.5  transition-colors hover:bg-blue-50 hover:opacity-80 text-[#2563eb]"
+              className="rounded-md p-1.5 text-[#2563eb] transition-colors hover:bg-blue-50 hover:opacity-80"
             >
               <LogOut className="size-4.5" />
             </button>

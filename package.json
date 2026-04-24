@@ -1,5 +1,5 @@
 {
-  "name": "Spot",
+  "name": "spot",
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
@@ -42,15 +42,5 @@
     "plugins": {
       "@tailwindcss/postcss": {}
     }
-  },
-  "prettier": {
-    "plugins": [
-      "prettier-plugin-tailwindcss"
-    ],
-    "quoteProps": "consistent",
-    "singleQuote": true,
-    "trailingComma": "all",
-    "printWidth": 120,
-    "semi": true
   }
 }
