@@ -9,6 +9,7 @@ interface CardData {
   id: number;
   src: string;
   matched: boolean;
+  matchedBy?: number;
 }
 
 interface TurnLogEntry {
@@ -32,7 +33,36 @@ interface CardProps {
   handleChoice: (card: CardData) => void;
   flipped: boolean;
   disabled: boolean;
+  isMultiplayer: boolean;
+  currentPlayer: number;
 }
+
+const PLAYER_CONFIGS = [
+  {
+    border: "border-indigo-400/90",
+    bg: "bg-indigo-50",
+    ring: "ring-indigo-400",
+    text: "text-indigo-600",
+  },
+  {
+    border: "border-sky-400/90",
+    bg: "bg-sky-50",
+    ring: "ring-sky-400",
+    text: "text-sky-600",
+  },
+  {
+    border: "border-teal-400/90",
+    bg: "bg-teal-50",
+    ring: "ring-teal-400",
+    text: "text-teal-600",
+  },
+  {
+    border: "border-lime-400/90",
+    bg: "bg-lime-50",
+    ring: "ring-lime-400",
+    text: "text-lime-600",
+  },
+];
 
 /**
  * Helper function to shuffle an array (Fisher-Yates Shuffle)
@@ -49,22 +79,26 @@ const shuffleArray = <T,>(array: T[]): T[] => {
 /**
  * Single Card Component
  */
-const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) => {
+const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isMultiplayer, currentPlayer }) => {
   const handleClick = () => {
     if (!disabled) {
       handleChoice(card);
     }
   };
 
+  const borderColor = isMultiplayer
+    ? card.matched
+      ? PLAYER_CONFIGS[(card.matchedBy ?? 0) % PLAYER_CONFIGS.length].border
+      : PLAYER_CONFIGS[currentPlayer % PLAYER_CONFIGS.length].border
+    : card.matched
+      ? "border-green-400/90"
+      : "border-blue-400/90";
+
   return (
     <div className="group relative aspect-square cursor-pointer perspective-[1000px]" onClick={handleClick}>
       <div
         className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-500 transform-3d ${
-          flipped
-            ? card.matched
-              ? "transform-[rotateY(180deg)] border-green-400/90"
-              : "transform-[rotateY(180deg)] border-blue-400/90"
-            : "border-slate-200 hover:border-blue-300"
+          flipped ? "transform-[rotateY(180deg)] " + borderColor : "border-slate-200 hover:border-blue-300"
         }`}
       >
         {/* Front (Image) - Visible when flipped */}
@@ -94,7 +128,15 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled }) =>
   );
 };
 
-export default function MemoryGame({ title, description }: { title?: string; description?: string }) {
+export default function MemoryGame({
+  title,
+  description,
+  playersCount = 1,
+}: {
+  title?: string;
+  description?: string;
+  playersCount?: number;
+}) {
   const [cards, setCards] = useState<CardData[]>([]);
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState<CardData | null>(null);
@@ -117,6 +159,9 @@ export default function MemoryGame({ title, description }: { title?: string; des
   const [isGameActive, setIsGameActive] = useState(false);
   const [scoreSaved, setScoreSaved] = useState(false);
   const [currentScore, setCurrentScore] = useState<number | null>(null);
+
+  const [currentPlayer, setCurrentPlayer] = useState(0);
+  const [playerMatches, setPlayerMatches] = useState<number[]>([]);
 
   // Convex hooks
   const saveGameScore = useMutation(api.scoreFunctions.saveGameScore);
@@ -169,6 +214,8 @@ export default function MemoryGame({ title, description }: { title?: string; des
     setIsGameActive(false);
     setScoreSaved(false);
     setCurrentScore(null);
+    setCurrentPlayer(0);
+    setPlayerMatches(Array(playersCount).fill(0));
   };
 
   // Reset turn
@@ -273,18 +320,30 @@ export default function MemoryGame({ title, description }: { title?: string; des
         setCards((prevCards) => {
           return prevCards.map((card) => {
             if (card.src === choiceOne.src) {
-              return { ...card, matched: true };
+              return { ...card, matched: true, matchedBy: currentPlayer };
             }
             return card;
           });
         });
         setMatches((prev) => prev + 1);
+        if (playersCount > 1) {
+          setPlayerMatches((prev) => {
+            const newMatches = [...prev];
+            newMatches[currentPlayer]++;
+            return newMatches;
+          });
+        }
         resetTurn();
       } else {
-        setTimeout(() => resetTurn(), 1000);
+        setTimeout(() => {
+          if (playersCount > 1) {
+            setCurrentPlayer((prev) => (prev + 1) % playersCount);
+          }
+          resetTurn();
+        }, 1000);
       }
     }
-  }, [choiceOne, choiceTwo, resetTurn]);
+  }, [choiceOne, choiceTwo, resetTurn, currentPlayer, playersCount]);
 
   // Win check
   useEffect(() => {
@@ -299,6 +358,12 @@ export default function MemoryGame({ title, description }: { title?: string; des
   // Save score when game is won
   useEffect(() => {
     if (isWon && !scoreSaved && attempts > 0) {
+      if (playersCount > 1) {
+        // Skip saving to Convex for multiplayer
+        setScoreSaved(true);
+        setCurrentScore(null);
+        return;
+      }
       const counted = turnsLog.filter((t) => t.countsInAccuracy);
       const correct = counted.filter((t) => t.isCorrect).length;
       const accuracy = counted.length === 0 ? 100 : Math.round((correct / counted.length) * 100);
@@ -312,7 +377,7 @@ export default function MemoryGame({ title, description }: { title?: string; des
           setScoreSaved(true);
         });
     }
-  }, [isWon, scoreSaved, turns, time, attempts, turnsLog, saveGameScore]);
+  }, [isWon, scoreSaved, turns, time, attempts, turnsLog, saveGameScore, playersCount]);
 
   // Timer logic
   useEffect(() => {
@@ -357,43 +422,69 @@ export default function MemoryGame({ title, description }: { title?: string; des
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-4 gap-2 sm:gap-4">
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Time
-            </span>
-            <span className="text-lg font-bold text-slate-700">
-              {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
-            </span>
+        {playersCount > 1 ? (
+          <div
+            className={`grid gap-2 sm:gap-4 ${
+              playersCount === 2 ? "grid-cols-2" : playersCount === 3 ? "grid-cols-3" : "grid-cols-2 sm:grid-cols-4"
+            }`}
+          >
+            {playerMatches.map((score, index) => {
+              const theme = PLAYER_CONFIGS[index % PLAYER_CONFIGS.length];
+              const isActive = currentPlayer === index;
+              return (
+                <div
+                  key={index}
+                  className={`rounded-lg p-2 pb-1 text-center transition-all duration-300 sm:p-3 ${
+                    isActive ? `${theme.bg} ring-2 ${theme.ring} shadow-md` : `bg-slate-50`
+                  }`}
+                >
+                  <span className={`block text-[10px] font-semibold tracking-wider uppercase sm:text-xs ${theme.text}`}>
+                    Player {index + 1}
+                  </span>
+                  <span className={`text-lg font-bold ${theme.text}`}>{score}</span>
+                </div>
+              );
+            })}
           </div>
+        ) : (
+          <div className="grid grid-cols-4 gap-2 sm:gap-4">
+            <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
+                Time
+              </span>
+              <span className="text-lg font-bold text-slate-700">
+                {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
+              </span>
+            </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Turns
-            </span>
-            <span className="text-lg font-bold text-slate-700">{turns}</span>
-          </div>
+            <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
+                Turns
+              </span>
+              <span className="text-lg font-bold text-slate-700">{turns}</span>
+            </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Matches
-            </span>
-            <span className="text-lg font-bold text-slate-700">{matches}/8</span>
-          </div>
+            <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
+                Matches
+              </span>
+              <span className="text-lg font-bold text-slate-700">{matches}/8</span>
+            </div>
 
-          <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
-            <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
-              Accuracy
-            </span>
-            <span className="text-lg font-bold text-slate-700">
-              {(() => {
-                const c = turnsLog.filter((t) => t.countsInAccuracy);
-                const ok = c.filter((t) => t.isCorrect).length;
-                return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
-              })()}
-            </span>
+            <div className="rounded-lg bg-slate-50 p-2 pb-1 text-center sm:p-3">
+              <span className="block text-[10px] font-semibold tracking-wider text-slate-400 uppercase sm:text-xs">
+                Accuracy
+              </span>
+              <span className="text-lg font-bold text-slate-700">
+                {(() => {
+                  const c = turnsLog.filter((t) => t.countsInAccuracy);
+                  const ok = c.filter((t) => t.isCorrect).length;
+                  return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
+                })()}
+              </span>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Game Grid */}
@@ -405,6 +496,8 @@ export default function MemoryGame({ title, description }: { title?: string; des
             handleChoice={handleChoice}
             flipped={card === choiceOne || card === choiceTwo || card.matched}
             disabled={disabled}
+            isMultiplayer={playersCount > 1}
+            currentPlayer={currentPlayer}
           />
         ))}
       </div>
@@ -435,35 +528,65 @@ export default function MemoryGame({ title, description }: { title?: string; des
               <Trophy className="h-10 w-10" />
             </div>
 
-            <h2 className="mb-2 text-3xl font-bold text-slate-800">You Won!</h2>
-            <p className="mb-4 text-slate-500">
-              Completed in <span className="font-bold text-blue-600">{turns}</span> turns
-            </p>
-
-            <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
-              <div className="rounded-lg bg-slate-50 p-3">
-                <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
-                <div className="mt-1 font-bold text-slate-700">
-                  {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
-                </div>
-              </div>
-              <div className="rounded-lg bg-slate-50 p-3">
-                <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
-                <div className="mt-1 font-bold text-slate-700">
+            {playersCount > 1 ? (
+              <>
+                <h2 className="mb-2 text-3xl font-bold text-slate-800">
                   {(() => {
-                    const c = turnsLog.filter((t) => t.countsInAccuracy);
-                    const ok = c.filter((t) => t.isCorrect).length;
-                    return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
+                    const maxScore = Math.max(...playerMatches);
+                    const winners = playerMatches
+                      .map((score, index) => (score === maxScore ? index : -1))
+                      .filter((i) => i !== -1);
+                    if (winners.length > 1) return "It's a Tie!";
+                    return `Player ${winners[0] + 1} Wins!`;
                   })()}
+                </h2>
+                <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
+                  {playerMatches.map((score, index) => {
+                    const theme = PLAYER_CONFIGS[index % PLAYER_CONFIGS.length];
+                    return (
+                      <div key={index} className={`rounded-xl border border-slate-100 p-3 text-center ${theme.bg}`}>
+                        <div className={`text-[10px] font-bold tracking-wider uppercase ${theme.text}`}>
+                          Player {index + 1}
+                        </div>
+                        <div className="text-xl font-bold text-slate-800">{score} Pairs</div>
+                      </div>
+                    );
+                  })}
                 </div>
-              </div>
-              {currentScore !== null && (
-                <div className="col-span-2 rounded-lg bg-slate-50 p-3">
-                  <div className="text-xs tracking-wider text-slate-400 uppercase">Score</div>
-                  <div className="mt-1 text-xl font-bold text-slate-700">{currentScore.toLocaleString()}</div>
+              </>
+            ) : (
+              <>
+                <h2 className="mb-2 text-3xl font-bold text-slate-800">You Won!</h2>
+                <p className="mb-4 text-slate-500">
+                  Completed in <span className="font-bold text-blue-600">{turns}</span> turns
+                </p>
+
+                <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
+                  <div className="rounded-lg bg-slate-50 p-3">
+                    <div className="text-xs tracking-wider text-slate-400 uppercase">Time</div>
+                    <div className="mt-1 font-bold text-slate-700">
+                      {Math.floor(time / 60)}:{(time % 60).toString().padStart(2, "0")}
+                    </div>
+                  </div>
+                  <div className="rounded-lg bg-slate-50 p-3">
+                    <div className="text-xs tracking-wider text-slate-400 uppercase">Accuracy</div>
+                    <div className="mt-1 font-bold text-slate-700">
+                      {(() => {
+                        const c = turnsLog.filter((t) => t.countsInAccuracy);
+                        const ok = c.filter((t) => t.isCorrect).length;
+                        return c.length === 0 ? "-%" : `${Math.round((ok / c.length) * 100)}%`;
+                      })()}
+                    </div>
+                  </div>
+                  {currentScore !== null && (
+                    <div className="col-span-2 rounded-lg bg-slate-50 p-3">
+                      <div className="text-xs tracking-wider text-slate-400 uppercase">Score</div>
+                      <div className="mt-1 text-xl font-bold text-slate-700">{currentScore.toLocaleString()}</div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
 
             <button
               onClick={shuffleCards}
