@@ -95,7 +95,12 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isMu
       : "border-blue-400/90";
 
   return (
-    <div className="group relative aspect-square cursor-pointer perspective-[1000px]" onClick={handleClick}>
+    <div
+      className={`group relative aspect-square perspective-[1000px] ${
+        card.matched || disabled ? "cursor-default" : "cursor-pointer"
+      }`}
+      onClick={handleClick}
+    >
       <div
         className={`h-full w-full transform rounded-xl border-2 shadow-sm transition-all duration-500 transform-3d ${
           flipped ? "transform-[rotateY(180deg)] " + borderColor : "border-slate-200 hover:border-blue-300"
@@ -228,6 +233,9 @@ export default function MemoryGame({
 
   // Handle choice
   const handleChoice = (card: CardData) => {
+    // Prevent clicking if card is already matched or if two cards are already chosen
+    if (card.matched || choiceTwo) return;
+
     // Prevent clicking the same card twice
     if (choiceOne && card.id === choiceOne.id) return;
 
