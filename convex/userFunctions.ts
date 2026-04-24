@@ -63,3 +63,107 @@ export const viewer = query({
     return await ctx.auth.getUserIdentity();
   },
 });
+
+// Get the current user's own game stats across all game modes
+export const getMyGameStats = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) return null;
+
+    const games = await ctx.db
+      .query('gameScores')
+      .filter((q) => q.eq(q.field('userId'), userId))
+      .collect();
+
+    const sortedGames = games.sort((a, b) => b._creationTime - a._creationTime);
+
+    // ── Classic ──────────────────────────────────────────────────────────────
+    const classicGames = sortedGames.filter(
+      (g) => g.gameMode === 'classic' || g.gameMode === undefined,
+    );
+    const classicTotals = classicGames.reduce(
+      (acc, g) => {
+        acc.score += g.score;
+        acc.turns += g.turns ?? 0;
+        acc.time += g.time;
+        acc.accuracy += g.accuracy ?? 0;
+        return acc;
+      },
+      { score: 0, turns: 0, time: 0, accuracy: 0 },
+    );
+    const classicBest = classicGames.reduce<typeof classicGames[number] | null>((best, g) => {
+      if (!best || g.score > best.score) return g;
+      return best;
+    }, null);
+
+    // ── Speed ────────────────────────────────────────────────────────────────
+    const speedGames = sortedGames.filter((g) => g.gameMode === 'speed');
+    const speedTotals = speedGames.reduce(
+      (acc, g) => {
+        acc.score += g.score;
+        acc.time += g.time;
+        return acc;
+      },
+      { score: 0, time: 0 },
+    );
+    const speedBest = speedGames.reduce<typeof speedGames[number] | null>((best, g) => {
+      // Best speed = highest score (score already reflects difficulty)
+      if (!best || g.score > best.score) return g;
+      return best;
+    }, null);
+
+    const n = classicGames.length;
+    const ns = speedGames.length;
+
+    return {
+      totalGames: sortedGames.length,
+      classic: {
+        totalGames: n,
+        highscore: classicBest?.score ?? null,
+        bestTurns: classicBest?.turns ?? null,
+        bestTime: classicBest?.time ?? null,
+        bestAccuracy: classicBest?.accuracy ?? null,
+        averages:
+          n === 0
+            ? null
+            : {
+                score: classicTotals.score / n,
+                turns: classicTotals.turns / n,
+                time: classicTotals.time / n,
+                accuracy: classicTotals.accuracy / n,
+              },
+        games: classicGames.map((g) => ({
+          _id: g._id,
+          score: g.score,
+          turns: g.turns ?? 0,
+          time: g.time,
+          accuracy: g.accuracy ?? 0,
+          playedAt: g._creationTime,
+        })),
+      },
+      speed: {
+        totalGames: ns,
+        highscore: speedBest?.score ?? null,
+        bestTime: speedBest?.time ?? null,
+        bestDifficulty: speedBest?.difficulty ?? null,
+        bestRevealMode: speedBest?.revealMode ?? null,
+        averages:
+          ns === 0
+            ? null
+            : {
+                score: speedTotals.score / ns,
+                time: speedTotals.time / ns,
+              },
+        games: speedGames.map((g) => ({
+          _id: g._id,
+          score: g.score,
+          time: g.time,
+          difficulty: g.difficulty ?? 'easy',
+          revealMode: g.revealMode ?? 'sequential',
+          playedAt: g._creationTime,
+        })),
+      },
+    };
+  },
+});

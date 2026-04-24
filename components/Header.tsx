@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { useAuthActions } from '@convex-dev/auth/react';
 import { useConvexAuth, useQuery } from 'convex/react';
-import { LogOut, Settings, UsersRound } from 'lucide-react';
+import { LogOut, BarChart3, Settings, UsersRound } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -68,6 +68,13 @@ export default function Header() {
                 <UsersRound className="h-4.5 w-4.5" />
               </Link>
             )}
+            <Link
+              href="/stats"
+              title="My Stats"
+              className="rounded-md p-1.5 text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700"
+            >
+              <BarChart3 className="h-4.5 w-4.5" />
+            </Link>
             <Link
               href="/settings"
               title="Settings"
