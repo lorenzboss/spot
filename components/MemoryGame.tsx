@@ -2,9 +2,10 @@
 
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Gamepad, RefreshCw, Trophy, Undo2 } from "lucide-react";
+import { Crown, Gamepad, RefreshCw, Settings, Trophy, Undo2, Users, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import MultiplayerConfig from "./MultiplayerConfig";
 
 interface CardData {
   id: number;
@@ -137,11 +138,23 @@ const Card: React.FC<CardProps> = ({ card, handleChoice, flipped, disabled, isMu
 export default function MemoryGame({
   title,
   description,
-  playersCount = 1,
+  playersCount: initialPlayersCount = 1,
+  isTournament: initialIsTournament = false,
+  initialPlayers,
+  targetGames: initialTargetGames = 3,
+  initialTournamentScores,
+  initialTournamentHistory,
+  initialGameIndex = 1,
 }: {
   title?: string;
   description?: string;
   playersCount?: number;
+  isTournament?: boolean;
+  initialPlayers?: { name: string }[];
+  targetGames?: number | "unlimited";
+  initialTournamentScores?: number[];
+  initialTournamentHistory?: { winners: number[] }[];
+  initialGameIndex?: number;
 }) {
   const router = useRouter();
   const [cards, setCards] = useState<CardData[]>([]);
@@ -169,6 +182,40 @@ export default function MemoryGame({
 
   const [currentPlayer, setCurrentPlayer] = useState(0);
   const [playerMatches, setPlayerMatches] = useState<number[]>([]);
+
+  // Tournament state
+  const [isTournament, setIsTournament] = useState(initialIsTournament);
+  const [targetGames, setTargetGames] = useState<number | "unlimited">(initialTargetGames);
+  const [players, setPlayers] = useState<{ id: string; name: string }[]>(
+    initialPlayers?.map((p, i) => ({ id: i.toString(), name: p.name })) ||
+      Array(initialPlayersCount)
+        .fill(0)
+        .map((_, i) => ({ id: i.toString(), name: `Player ${i + 1}` })),
+  );
+  const [tournamentScores, setTournamentScores] = useState<number[]>(
+    initialTournamentScores || Array(players.length).fill(0),
+  );
+  const [tournamentHistory, setTournamentHistory] = useState<{ winners: number[] }[]>(initialTournamentHistory || []);
+  const [currentGameIndex, setCurrentGameIndex] = useState(initialGameIndex);
+  const [isConfigOpen, setIsConfigOpen] = useState(false);
+  const [showFinalStandings, setShowFinalStandings] = useState(false);
+  const [playersCount, setPlayersCount] = useState(players.length);
+
+  // Update URL for persistence
+  useEffect(() => {
+    const names = players.map((p) => p.name).join(",");
+    const scores = tournamentScores.join(",");
+    const history = tournamentHistory.map((h) => h.winners.join(",")).join("|");
+    const params = new URLSearchParams();
+    params.set("names", names);
+    params.set("tournament", isTournament.toString());
+    params.set("games", targetGames.toString());
+    params.set("scores", scores);
+    params.set("history", history);
+    params.set("current", currentGameIndex.toString());
+
+    router.replace(`/play/local-multiplayer/game?${params.toString()}`, { scroll: false });
+  }, [players, isTournament, targetGames, tournamentScores, tournamentHistory, currentGameIndex, router]);
 
   // Convex hooks
   const saveGameScore = useMutation(api.scoreFunctions.saveGameScore);
@@ -221,7 +268,9 @@ export default function MemoryGame({
     setIsGameActive(false);
     setScoreSaved(false);
     setCurrentScore(null);
-    setCurrentPlayer(0);
+    // Random starting player for tournament or multiplayer
+    const startingPlayer = Math.floor(Math.random() * playersCount);
+    setCurrentPlayer(startingPlayer);
     setPlayerMatches(Array(playersCount).fill(0));
   };
 
@@ -369,7 +418,27 @@ export default function MemoryGame({
   useEffect(() => {
     if (isWon && !scoreSaved && attempts > 0) {
       if (playersCount > 1) {
-        // Skip saving to Convex for multiplayer
+        // Tournament scoring
+        if (isTournament) {
+          const maxMatches = Math.max(...playerMatches);
+          const winners = playerMatches
+            .map((matches, index) => (matches === maxMatches ? index : -1))
+            .filter((i) => i !== -1);
+
+          setTournamentScores((prev) => {
+            const next = [...prev];
+            if (winners.length > 1) {
+              // Draw: 1 point each
+              winners.forEach((w) => (next[w] += 1));
+            } else {
+              // Win: 2 points
+              next[winners[0]] += 2;
+            }
+            return next;
+          });
+          setTournamentHistory((prev) => [...prev, { winners }]);
+        }
+
         setScoreSaved(true);
         setCurrentScore(null);
         return;
@@ -437,8 +506,38 @@ export default function MemoryGame({
             >
               <RefreshCw className="h-5 w-5" />
             </button>
+            {playersCount > 1 && (
+              <>
+                {isTournament && targetGames === "unlimited" && tournamentHistory.length > 0 && (
+                  <button
+                    onClick={() => setShowFinalStandings(true)}
+                    className="rounded-xl bg-blue-50 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-100 hover:text-blue-700"
+                    title="Finish & View Results"
+                  >
+                    <Trophy className="h-5 w-5" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsConfigOpen(true)}
+                  className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
+                  title="Manage Players"
+                >
+                  <Settings className="h-5 w-5" />
+                </button>
+              </>
+            )}
           </div>
         </div>
+
+        {/* Tournament Info */}
+        {isTournament && (
+          <div className="flex items-center justify-between px-1 text-sm font-medium text-slate-500">
+            <span>
+              Game {currentGameIndex}
+              {targetGames !== "unlimited" ? ` of ${targetGames}` : ""}
+            </span>
+          </div>
+        )}
 
         {/* Stats Grid */}
         {playersCount > 1 ? (
@@ -453,14 +552,27 @@ export default function MemoryGame({
               return (
                 <div
                   key={index}
-                  className={`rounded-lg p-2 pb-1 text-center transition-all duration-300 sm:p-3 ${
+                  className={`relative rounded-lg p-2 pb-1 text-center transition-all duration-300 sm:p-3 ${
                     isActive ? `${theme.bg} ring-2 ${theme.ring} shadow-md` : `bg-slate-50`
                   }`}
                 >
-                  <span className={`block text-[10px] font-semibold tracking-wider uppercase sm:text-xs ${theme.text}`}>
-                    Player {index + 1}
+                  {isTournament && (
+                    <div
+                      className={`absolute -top-1.5 -right-1.5 flex h-6 min-w-[24px] items-center justify-center rounded-full border-2 border-white px-1.5 text-[10px] font-bold shadow-sm ${theme.bg} ${theme.text} ring-1 ${theme.ring}`}
+                      title="Tournament Points"
+                    >
+                      {tournamentScores[index]}
+                    </div>
+                  )}
+                  <span
+                    className={`block truncate text-[10px] font-semibold tracking-wider uppercase sm:text-xs ${theme.text}`}
+                  >
+                    {players[index]?.name || `Player ${index + 1}`}
                   </span>
-                  <span className={`text-lg font-bold ${theme.text}`}>{score}</span>
+                  <div className="flex flex-col items-center">
+                    <span className={`text-lg font-bold ${theme.text}`}>{score || 0}</span>
+                    <span className="text-[9px] leading-none font-medium text-slate-400 uppercase">Pairs</span>
+                  </div>
                 </div>
               );
             })}
@@ -556,22 +668,44 @@ export default function MemoryGame({
                       .map((score, index) => (score === maxScore ? index : -1))
                       .filter((i) => i !== -1);
                     if (winners.length > 1) return "It's a Tie!";
-                    return `Player ${winners[0] + 1} Wins!`;
+                    return `${players[winners[0]]?.name || `Player ${winners[0] + 1}`} Wins!`;
                   })()}
                 </h2>
+                <div className="mb-4 text-sm font-medium text-slate-500">
+                  {isTournament ? "Current Game Results" : "Game Over"}
+                </div>
                 <div className="mb-6 grid grid-cols-2 gap-3 text-sm">
                   {playerMatches.map((score, index) => {
                     const theme = PLAYER_CONFIGS[index % PLAYER_CONFIGS.length];
                     return (
                       <div key={index} className={`rounded-xl border border-slate-100 p-3 text-center ${theme.bg}`}>
                         <div className={`text-[10px] font-bold tracking-wider uppercase ${theme.text}`}>
-                          Player {index + 1}
+                          {players[index]?.name || `Player ${index + 1}`}
                         </div>
                         <div className="text-xl font-bold text-slate-800">{score} Pairs</div>
                       </div>
                     );
                   })}
                 </div>
+
+                {isTournament && (
+                  <div className="mb-6 rounded-2xl bg-slate-50 p-4">
+                    <h3 className="mb-3 text-xs font-bold tracking-widest text-slate-400 uppercase">
+                      Tournament Standings
+                    </h3>
+                    <div className="space-y-2">
+                      {tournamentScores.map((score, index) => {
+                        const theme = PLAYER_CONFIGS[index % PLAYER_CONFIGS.length];
+                        return (
+                          <div key={index} className="flex items-center justify-between">
+                            <span className={`font-semibold ${theme.text}`}>{players[index]?.name}</span>
+                            <span className="font-bold text-slate-700">{score} Points</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -608,13 +742,90 @@ export default function MemoryGame({
             )}
 
             <button
-              onClick={shuffleCards}
+              onClick={() => {
+                if (isTournament && targetGames !== "unlimited" && currentGameIndex >= targetGames) {
+                  setShowFinalStandings(true);
+                } else {
+                  if (isTournament) {
+                    setCurrentGameIndex((prev) => prev + 1);
+                  }
+                  shuffleCards();
+                }
+              }}
               className="w-full rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
             >
-              Play Again
+              {isTournament
+                ? targetGames !== "unlimited" && currentGameIndex >= targetGames
+                  ? "View Final Standings"
+                  : "Next Game"
+                : "Play Again"}
             </button>
           </div>
         </div>
+      )}
+
+      {/* Manage Players Dialog */}
+      {isConfigOpen && (
+        <MultiplayerConfig
+          isDialog
+          initialPlayers={players}
+          initialIsTournament={isTournament}
+          initialGameCount={targetGames}
+          minGameCount={currentGameIndex}
+          onCancel={() => setIsConfigOpen(false)}
+          onStart={(newPlayers, newIsTournament, newGameCount) => {
+            // Update players and scores
+            setPlayers(newPlayers);
+            setPlayersCount(newPlayers.length);
+            setIsTournament(newIsTournament);
+            setTargetGames(newGameCount);
+
+            setTournamentScores((prev) => {
+              const next = Array(newPlayers.length).fill(0);
+              prev.forEach((score, i) => {
+                if (i < next.length) next[i] = score;
+              });
+              return next;
+            });
+
+            // Update current game matches to avoid NaN and ensure new players are shown
+            setPlayerMatches((prev) => {
+              const next = Array(newPlayers.length).fill(0);
+              prev.forEach((m, i) => {
+                if (i < next.length) next[i] = m || 0;
+              });
+              return next;
+            });
+
+            // Clamp current player to the new range
+            setCurrentPlayer((prev) => (prev >= newPlayers.length ? 0 : prev));
+
+            setIsConfigOpen(false);
+            // Optional: Restart game if players changed significantly?
+            // User said "Mann kann auch während des turniers noch einen neuen spielder hinzufügen, löschen oder bearbeiten"
+            // If they change configuration, they probably want to continue.
+            // But if they added a player mid-game, it might be weird.
+            // For now, let's just update the state.
+          }}
+        />
+      )}
+
+      {showFinalStandings && (
+        <FinalStandingsOverlay
+          history={tournamentHistory}
+          players={players}
+          onRestart={() => {
+            setTournamentScores(Array(players.length).fill(0));
+            setTournamentHistory([]);
+            setCurrentGameIndex(1);
+            shuffleCards();
+            setShowFinalStandings(false);
+          }}
+          onClose={() => {
+            setShowFinalStandings(false);
+            router.push("/play/local-multiplayer");
+          }}
+        />
       )}
 
       {/* CSS Utility for 3D Flip */}
@@ -634,7 +845,154 @@ export default function MemoryGame({
         .animate-fade-in {
             animation: fadeIn 0.2s ease forwards;
         }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 2.5s ease-in-out infinite;
+        }
       `}</style>
     </div>
   );
 }
+
+/**
+ * Final Standings Overlay with growth animation
+ */
+const FinalStandingsOverlay = ({
+  history,
+  players,
+  onClose,
+  onRestart,
+}: {
+  history: { winners: number[] }[];
+  players: { name: string }[];
+  onClose: () => void;
+  onRestart: () => void;
+}) => {
+  const [step, setStep] = useState(-1);
+  const [visualScores, setVisualScores] = useState<number[]>(Array(players.length).fill(0));
+  const [winnerRevealed, setWinnerRevealed] = useState(false);
+
+  useEffect(() => {
+    if (step < history.length - 1) {
+      const timer = setTimeout(() => {
+        const nextStep = step + 1;
+        setStep(nextStep);
+        const gameWinners = history[nextStep].winners;
+        setVisualScores((prev) => {
+          const next = [...prev];
+          if (gameWinners.length > 1) {
+            gameWinners.forEach((w) => (next[w] += 1));
+          } else {
+            next[gameWinners[0]] += 2;
+          }
+          return next;
+        });
+      }, 700);
+      return () => clearTimeout(timer);
+    } else if (step === history.length - 1) {
+      const timer = setTimeout(() => setWinnerRevealed(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [step, history]);
+
+  const maxPossibleScore = Math.max(...visualScores, 1);
+  const sortedIndices = [...Array(players.length).keys()].sort((a, b) => visualScores[b] - visualScores[a]);
+
+  return (
+    <div className="animate-in fade-in fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md duration-700">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] bg-white/80 p-1 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:max-w-xl">
+        <div className="bg-linear-to-b from-white to-slate-50/50 p-8 sm:p-12">
+          <button
+            onClick={onClose}
+            className="absolute top-8 right-8 rounded-full bg-slate-200/50 p-2 text-slate-500 transition-all hover:bg-slate-200 hover:text-slate-800 active:scale-90"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="mb-10 text-center">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-600 shadow-xl shadow-blue-200">
+              <Trophy className="h-10 w-10 text-white" />
+            </div>
+            <h2 className="text-4xl font-black tracking-tight text-slate-900 uppercase sm:text-5xl">
+              {winnerRevealed ? "Leaderboard" : "Recap"}
+            </h2>
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <span className="h-px w-8 bg-slate-200" />
+              <p className="text-xs font-bold tracking-widest text-slate-400 uppercase">
+                {winnerRevealed ? "Tournament Over" : `Processing Game ${step + 1}`}
+              </p>
+              <span className="h-px w-8 bg-slate-200" />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {sortedIndices.map((playerIndex, rank) => {
+              const score = visualScores[playerIndex];
+              const player = players[playerIndex];
+              const theme = PLAYER_CONFIGS[playerIndex % PLAYER_CONFIGS.length];
+              const isWinner = winnerRevealed && rank === 0;
+              const progress = (score / maxPossibleScore) * 100;
+
+              return (
+                <div
+                  key={playerIndex}
+                  className={`group relative flex items-center gap-4 rounded-3xl border border-slate-100 bg-white p-4 transition-all duration-500 ${isWinner ? "ring-2 ring-yellow-400 shadow-lg shadow-yellow-100" : "shadow-sm"}`}
+                >
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-black text-white shadow-md ${isWinner ? "bg-yellow-400" : theme.bg} ${isWinner ? "text-slate-900" : theme.text}`}>
+                    {rank + 1}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="truncate font-bold text-slate-800">{player.name}</span>
+                      <span className={`font-black ${theme.text}`}>{score} pts</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full transition-all duration-700 ease-out ${isWinner ? "bg-yellow-400" : theme.bg}`}
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
+
+          {winnerRevealed && (
+            <div className="animate-in slide-in-from-bottom-4 fade-in mt-10 flex flex-col gap-3 duration-700 fill-mode-forwards">
+              <button
+                onClick={onRestart}
+                className="flex w-full items-center justify-center gap-3 rounded-[2rem] bg-blue-600 py-5 text-lg font-black text-white shadow-2xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
+              >
+                Play Again
+              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setStep(-1);
+                    setVisualScores(Array(players.length).fill(0));
+                    setWinnerRevealed(false);
+                  }}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-100 py-4 text-sm font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
+                >
+                  <RefreshCw className="h-4 w-4" /> Replay
+                </button>
+                <button
+                  onClick={onClose}
+                  className="flex flex-1 items-center justify-center rounded-2xl border-2 border-slate-100 bg-white py-4 text-sm font-bold text-slate-400 transition-all hover:border-slate-200 hover:text-slate-600 active:scale-95"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
