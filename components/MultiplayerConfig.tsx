@@ -1,7 +1,8 @@
 "use client";
 
-import { Plus, Trash2, Users, X } from "lucide-react";
+import { Plus, Users, X } from "lucide-react";
 import { useState } from "react";
+import { PlayerInput } from "./multiplayer-config/PlayerInput";
 
 interface Player {
   id: string;
@@ -34,7 +35,7 @@ export default function MultiplayerConfig({
     initialPlayers.map((p, index) => ({
       ...p,
       name: p.name === `Player ${index + 1}` ? "" : p.name,
-    }))
+    })),
   );
   const [isTournament, setIsTournament] = useState(initialIsTournament);
   const [gameCount, setGameCount] = useState<number | "unlimited">(initialGameCount);
@@ -64,7 +65,9 @@ export default function MultiplayerConfig({
   };
 
   const content = (
-    <div className={`w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg ${isDialog ? "mx-auto" : ""}`}>
+    <div
+      className={`w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg ${isDialog ? "mx-auto" : ""}`}
+    >
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
@@ -80,14 +83,12 @@ export default function MultiplayerConfig({
       </div>
 
       <div className="space-y-4">
-        {/* Tournament Toggle - Only visible on initial setup */}
+        {/* Tournament Toggle - Only visible on initial setup or specific dialogs */}
         {!isDialog && (
           <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-4">
             <div>
               <div className="font-semibold text-slate-700">Tournament Mode</div>
-              <div className="text-xs text-slate-500">
-                Track scores across multiple games (Win: 2 pts, Tie: 1 pt)
-              </div>
+              <div className="text-xs text-slate-500">Track scores across multiple games (Win: 2 pts, Tie: 1 pt)</div>
             </div>
             <button
               onClick={() => setIsTournament(!isTournament)}
@@ -105,49 +106,40 @@ export default function MultiplayerConfig({
         )}
 
         {/* Players List */}
-          <div className="flex items-center justify-between mb-2">
+        <div>
+          <div className="mb-2 flex items-center justify-between">
             <div className="text-sm font-semibold text-slate-600 uppercase">Players</div>
             <span className="text-xs text-slate-400">{players.length}/4</span>
           </div>
-        <div className="space-y-2">
-          {players.map((player, index) => (
-            <div key={player.id} className="flex items-center gap-2">
-              <input
-                type="text"
-                value={player.name}
-                onChange={(e) => updatePlayerName(player.id, e.target.value)}
-                placeholder={`Player ${index + 1}`}
-                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-hidden transition-all"
+          <div className="space-y-2">
+            {players.map((player, index) => (
+              <PlayerInput
+                key={player.id}
+                player={player}
+                index={index}
+                playersCount={players.length}
+                onUpdateName={updatePlayerName}
+                onRemove={removePlayer}
               />
+            ))}
+            {players.length < 4 && (
               <button
-                disabled={players.length <= 2}
-                onClick={() => removePlayer(player.id)}
-                className={`rounded-lg p-2.5 transition-colors ${
-                  players.length <= 2
-                    ? "text-slate-200 cursor-not-allowed"
-                    : "text-slate-400 hover:bg-red-50 hover:text-red-500"
-                }`}
-                title={players.length <= 2 ? "Minimum 2 players required" : "Remove player"}
+                onClick={addPlayer}
+                className="flex h-[44.85px] w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 text-sm font-medium text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
               >
-                <Trash2 className="h-4 w-4" />
+                <Plus className="h-4 w-4" /> Add Player
               </button>
-            </div>
-          ))}
-          {players.length < 4 && (
-            <button
-              onClick={addPlayer}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 h-[44.85px] text-sm font-medium text-slate-500 transition-all hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600"
-            >
-              <Plus className="h-4 w-4" /> Add Player
-            </button>
-          )}
+            )}
+          </div>
         </div>
 
-        {/* Tournament Settings (Animated height) */}
-        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isTournament ? "max-h-64 opacity-100" : "max-h-0 opacity-0"}`}>
+        {/* Tournament Settings */}
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-in-out ${isTournament ? "max-h-64 opacity-100" : "max-h-0 opacity-0"}`}
+        >
           <div className="space-y-4 pt-1 pb-2">
             <div className="space-y-3">
-              <div className="text-sm mb-2 font-semibold text-slate-600 uppercase">Number of Games</div>
+              <div className="mb-2 text-sm font-semibold text-slate-600 uppercase">Number of Games</div>
               <div className="grid grid-cols-4 gap-2">
                 {[3, 5, 10, "unlimited"].map((count) => {
                   const isTooSmall = typeof count === "number" && minGameCount !== undefined && count < minGameCount;
@@ -160,7 +152,7 @@ export default function MultiplayerConfig({
                         gameCount === count
                           ? "border-blue-600 bg-blue-50 text-blue-600 shadow-sm"
                           : isTooSmall
-                            ? "border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed"
+                            ? "cursor-not-allowed border-slate-100 bg-slate-50 text-slate-300"
                             : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
                       }`}
                     >
@@ -185,10 +177,8 @@ export default function MultiplayerConfig({
 
   if (isDialog) {
     return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-        <div className="animate-in zoom-in-95 duration-200 w-full max-w-md">
-          {content}
-        </div>
+      <div className="animate-in fade-in fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm duration-200">
+        <div className="animate-in zoom-in-95 w-full max-w-md duration-200">{content}</div>
       </div>
     );
   }

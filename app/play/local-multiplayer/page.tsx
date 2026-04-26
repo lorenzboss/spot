@@ -12,7 +12,11 @@ export default function LocalMultiplayerConfigPage() {
     return null;
   }
 
-  const handleStart = (players: { id: string; name: string }[], isTournament: boolean, gameCount: number | "unlimited") => {
+  const handleStart = (
+    players: { id: string; name: string }[],
+    isTournament: boolean,
+    gameCount: number | "unlimited",
+  ) => {
     const gameState = {
       players,
       isTournament,
