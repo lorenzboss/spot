@@ -2,41 +2,51 @@
 
 import MemoryGame from "@/components/MemoryGame";
 import { useConvexAuth } from "convex/react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function LocalMultiplayerGamePage() {
   const { isAuthenticated } = useConvexAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const [initialState, setInitialState] = useState<any>(null);
   
-  const namesStr = searchParams.get("names") || "Player 1,Player 2";
-  const names = namesStr.split(",");
   const isTournament = searchParams.get("tournament") === "true";
-  const gameCountStr = searchParams.get("games") || "3";
-  const gameCount = gameCountStr === "unlimited" ? "unlimited" : parseInt(gameCountStr, 10);
-  
-  // New persistence params
-  const scoresStr = searchParams.get("scores");
-  const initialScores = scoresStr ? scoresStr.split(",").map(Number) : undefined;
-  const historyStr = searchParams.get("history");
-  const initialHistory = historyStr ? historyStr.split("|").map(h => ({ winners: h.split(",").map(Number) })) : undefined;
-  const initialGameIndex = parseInt(searchParams.get("current") || "1", 10);
 
-  if (!isAuthenticated) {
+  useEffect(() => {
+    const saved = localStorage.getItem("memory-game-local-multiplayer");
+    if (saved) {
+      try {
+        setInitialState(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to parse game state", e);
+        router.push("/play/local-multiplayer");
+      }
+    } else {
+      // If no state in localStorage, redirect back to config
+      router.push("/play/local-multiplayer");
+    }
+  }, [router]);
+
+  if (!isAuthenticated || !initialState) {
     return null;
   }
 
   return (
     <main className="container mx-auto flex flex-1 flex-col items-center justify-center gap-6 p-4 sm:p-8">
       <MemoryGame 
-        title={isTournament ? "Tournament Mode" : "Local Multiplayer"} 
-        description={isTournament ? `Best of ${gameCount === "unlimited" ? "∞" : gameCount} games` : `${names.length} Players Game`} 
-        playersCount={names.length} 
-        isTournament={isTournament}
-        initialPlayers={names.map(name => ({ name }))}
-        targetGames={gameCount}
-        initialTournamentScores={initialScores}
-        initialTournamentHistory={initialHistory}
-        initialGameIndex={initialGameIndex}
+        title={initialState.isTournament ? "Tournament Mode" : "Local Multiplayer"} 
+        description={initialState.isTournament 
+          ? `Best of ${initialState.targetGames === "unlimited" ? "∞" : initialState.targetGames} games` 
+          : `${initialState.players.length} Players Game`
+        } 
+        playersCount={initialState.players.length} 
+        isTournament={initialState.isTournament}
+        initialPlayers={initialState.players}
+        targetGames={initialState.targetGames}
+        initialTournamentScores={initialState.tournamentScores}
+        initialTournamentHistory={initialState.tournamentHistory}
+        initialGameIndex={initialState.currentGameIndex}
       />
     </main>
   );

@@ -13,8 +13,16 @@ export default function LocalMultiplayerConfigPage() {
   }
 
   const handleStart = (players: { id: string; name: string }[], isTournament: boolean, gameCount: number | "unlimited") => {
-    const names = players.map(p => p.name).join(",");
-    router.push(`/play/local-multiplayer/game?names=${encodeURIComponent(names)}&tournament=${isTournament}&games=${gameCount}`);
+    const gameState = {
+      players,
+      isTournament,
+      targetGames: gameCount,
+      tournamentScores: Array(players.length).fill(0),
+      tournamentHistory: [],
+      currentGameIndex: 1,
+    };
+    localStorage.setItem("memory-game-local-multiplayer", JSON.stringify(gameState));
+    router.push(`/play/local-multiplayer/game?tournament=${isTournament}`);
   };
 
   return (

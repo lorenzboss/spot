@@ -2,7 +2,7 @@
 
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
-import { Crown, Gamepad, RefreshCw, Settings, Trophy, Undo2, Users, X } from "lucide-react";
+import { Gamepad, RefreshCw, Settings, Trophy, Undo2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import MultiplayerConfig from "./MultiplayerConfig";
@@ -201,20 +201,25 @@ export default function MemoryGame({
   const [showFinalStandings, setShowFinalStandings] = useState(false);
   const [playersCount, setPlayersCount] = useState(players.length);
 
-  // Update URL for persistence
+  // Update persistence
   useEffect(() => {
-    const names = players.map((p) => p.name).join(",");
-    const scores = tournamentScores.join(",");
-    const history = tournamentHistory.map((h) => h.winners.join(",")).join("|");
-    const params = new URLSearchParams();
-    params.set("names", names);
-    params.set("tournament", isTournament.toString());
-    params.set("games", targetGames.toString());
-    params.set("scores", scores);
-    params.set("history", history);
-    params.set("current", currentGameIndex.toString());
+    if (playersCount <= 1) return;
 
+    // URL only keeps the tournament flag
+    const params = new URLSearchParams();
+    params.set("tournament", isTournament.toString());
     router.replace(`/play/local-multiplayer/game?${params.toString()}`, { scroll: false });
+
+    // Everything else goes to LocalStorage
+    const gameState = {
+      players,
+      isTournament,
+      targetGames,
+      tournamentScores,
+      tournamentHistory,
+      currentGameIndex,
+    };
+    localStorage.setItem("memory-game-local-multiplayer", JSON.stringify(gameState));
   }, [players, isTournament, targetGames, tournamentScores, tournamentHistory, currentGameIndex, router]);
 
   // Convex hooks
@@ -493,9 +498,9 @@ export default function MemoryGame({
 
           <div className="flex items-center gap-2">
             <button
-              onClick={() => router.back()}
-              className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-blue-50 hover:text-blue-600"
-              title="Go Back"
+              onClick={() => router.push("/play/local-multiplayer")}
+              className="rounded-xl bg-slate-100 p-3 text-slate-600 transition-colors duration-200 hover:bg-red-50 hover:text-red-600"
+              title="Leave Game"
             >
               <Undo2 className="h-5 w-5" />
             </button>
@@ -823,7 +828,6 @@ export default function MemoryGame({
           }}
           onClose={() => {
             setShowFinalStandings(false);
-            router.push("/play/local-multiplayer");
           }}
         />
       )}
@@ -858,7 +862,7 @@ export default function MemoryGame({
 }
 
 /**
- * Final Standings Overlay with growth animation
+ * Final Standings Overlay with game-by-game animation
  */
 const FinalStandingsOverlay = ({
   history,
@@ -871,120 +875,238 @@ const FinalStandingsOverlay = ({
   onClose: () => void;
   onRestart: () => void;
 }) => {
-  const [step, setStep] = useState(-1);
+  const [phase, setPhase] = useState<"recap" | "podium">("recap");
+  const [currentGameIndex, setCurrentGameIndex] = useState(-1);
   const [visualScores, setVisualScores] = useState<number[]>(Array(players.length).fill(0));
-  const [winnerRevealed, setWinnerRevealed] = useState(false);
+  const [visualScoresForIcons, setVisualScoresForIcons] = useState<number[]>(Array(players.length).fill(0));
 
+  // Sequence controller
   useEffect(() => {
-    if (step < history.length - 1) {
-      const timer = setTimeout(() => {
-        const nextStep = step + 1;
-        setStep(nextStep);
-        const gameWinners = history[nextStep].winners;
-        setVisualScores((prev) => {
-          const next = [...prev];
-          if (gameWinners.length > 1) {
-            gameWinners.forEach((w) => (next[w] += 1));
-          } else {
-            next[gameWinners[0]] += 2;
+    let timer: NodeJS.Timeout;
+    
+    if (phase === "recap") {
+      // Start the process
+      if (currentGameIndex === -1) {
+        timer = setTimeout(() => setCurrentGameIndex(0), 500);
+      } 
+      // Handle score update for current game
+      else if (currentGameIndex < history.length) {
+        // First, update the visual scores after a short delay to match animation
+        const scoreTimer = setTimeout(() => {
+          const winners = history[currentGameIndex].winners;
+          
+          if (winners.length > 1) {
+            // Draw: everyone gets 1 point
+            const update = (prev: number[]) => {
+              const next = [...prev];
+              winners.forEach((w) => (next[w] += 1));
+              return next;
+            };
+            setVisualScores(update);
+            setVisualScoresForIcons(update);
+          } else if (winners.length === 1) {
+            // Solo win: icon scales immediately by 2, number counts up 1 -> 2
+            const winnerIdx = winners[0];
+            setVisualScoresForIcons((prev) => {
+              const next = [...prev];
+              next[winnerIdx] += 2;
+              return next;
+            });
+            
+            setVisualScores((prev) => {
+              const next = [...prev];
+              next[winnerIdx] += 1;
+              return next;
+            });
+            
+            setTimeout(() => {
+              setVisualScores((prev) => {
+                const next = [...prev];
+                next[winnerIdx] += 1;
+                return next;
+              });
+            }, 200);
           }
-          return next;
-        });
-      }, 700);
-      return () => clearTimeout(timer);
-    } else if (step === history.length - 1) {
-      const timer = setTimeout(() => setWinnerRevealed(true), 800);
-      return () => clearTimeout(timer);
-    }
-  }, [step, history]);
+          
+          // Then, after showing the result for a bit, move to next game or podium
+          timer = setTimeout(() => {
+            if (currentGameIndex < history.length - 1) {
+              setCurrentGameIndex(prev => prev + 1);
+            } else {
+              // Wait 1 second after the final game before showing podium
+              timer = setTimeout(() => setPhase("podium"), 1000);
+            }
+          }, 600);
+        }, 200);
 
-  const maxPossibleScore = Math.max(...visualScores, 1);
-  const sortedIndices = [...Array(players.length).keys()].sort((a, b) => visualScores[b] - visualScores[a]);
+        return () => {
+          clearTimeout(scoreTimer);
+          clearTimeout(timer);
+        };
+      }
+    }
+    
+    return () => clearTimeout(timer);
+  }, [phase, currentGameIndex, history]);
+
+  const finalScores = Array(players.length).fill(0);
+  history.forEach((game) => {
+    if (game.winners.length > 1) {
+      game.winners.forEach((w) => (finalScores[w] += 1));
+    } else if (game.winners.length === 1) {
+      finalScores[game.winners[0]] += 2;
+    }
+  });
+
+  const maxTournamentScore = Math.max(...finalScores, 1);
+  const displayScores = phase === "podium" ? finalScores : visualScores;
+  const currentWinners = currentGameIndex >= 0 && currentGameIndex < history.length 
+    ? history[currentGameIndex].winners 
+    : [];
+
+  const sortedUniqueScores = Array.from(new Set(displayScores)).sort((a, b) => b - a);
+  const rankGroups = sortedUniqueScores.slice(0, 3).map((score, i) => ({
+    rank: i + 1,
+    score,
+    playerIndices: players.map((_, idx) => idx).filter(idx => displayScores[idx] === score)
+  }));
 
   return (
-    <div className="animate-in fade-in fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md duration-700">
-      <div className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] bg-white/80 p-1 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:max-w-xl">
-        <div className="bg-linear-to-b from-white to-slate-50/50 p-8 sm:p-12">
-          <button
-            onClick={onClose}
-            className="absolute top-8 right-8 rounded-full bg-slate-200/50 p-2 text-slate-500 transition-all hover:bg-slate-200 hover:text-slate-800 active:scale-90"
-          >
-            <X className="h-5 w-5" />
-          </button>
+    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md transition-all duration-500">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-[2.5rem] bg-white/90 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:max-w-xl">
+        <div className="bg-linear-to-b from-white to-slate-50/50 p-8 sm:p-12 relative min-h-[400px] flex flex-col">
+          
+          {/* Skip button (only in recap) */}
+          {phase === "recap" && (
+            <button
+              onClick={() => setPhase("podium")}
+              className="absolute top-8 right-8 rounded-full bg-slate-200/50 p-2 text-slate-500 transition-all hover:bg-slate-200 hover:text-slate-800 active:scale-90 z-10"
+              title="Skip"
+            >
+              <span className="text-xs font-bold px-2 uppercase">Skip</span>
+            </button>
+          )}
 
-          <div className="mb-10 text-center">
-            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-blue-600 shadow-xl shadow-blue-200">
-              <Trophy className="h-10 w-10 text-white" />
-            </div>
-            <h2 className="text-4xl font-black tracking-tight text-slate-900 uppercase sm:text-5xl">
-              {winnerRevealed ? "Leaderboard" : "Recap"}
-            </h2>
-            <div className="mt-2 flex items-center justify-center gap-2">
-              <span className="h-px w-8 bg-slate-200" />
-              <p className="text-xs font-bold tracking-widest text-slate-400 uppercase">
-                {winnerRevealed ? "Tournament Over" : `Processing Game ${step + 1}`}
-              </p>
-              <span className="h-px w-8 bg-slate-200" />
-            </div>
-          </div>
+          {/* Recap Phase */}
+          {phase === "recap" && (
+            <div className="flex-1 flex flex-col animate-fade-in">
+              <div className="text-center mb-12">
+                <h3 className="text-2xl font-black text-slate-800 uppercase tracking-wider mb-2">
+                  Game {Math.max(currentGameIndex + 1, 1)} <span className="text-slate-400 text-lg">/ {history.length}</span>
+                </h3>
+              </div>
 
-          <div className="space-y-4">
-            {sortedIndices.map((playerIndex, rank) => {
-              const score = visualScores[playerIndex];
-              const player = players[playerIndex];
-              const theme = PLAYER_CONFIGS[playerIndex % PLAYER_CONFIGS.length];
-              const isWinner = winnerRevealed && rank === 0;
-              const progress = (score / maxPossibleScore) * 100;
+              <div className="flex-1 flex items-end justify-center gap-6 sm:gap-10 h-64">
+                {players.map((player, index) => {
+                  const score = visualScores[index];
+                  const iconScore = visualScoresForIcons[index];
+                  const theme = PLAYER_CONFIGS[index % PLAYER_CONFIGS.length];
+                  const isWinner = currentWinners.includes(index);
+                  const pointsEarned = currentWinners.length > 1 ? "+1" : "+2";
+                  
+                  // Calculate dynamic scale based on immediate iconScore
+                  const iconScale = 1 + (iconScore / maxTournamentScore) * 0.5;
 
-              return (
-                <div
-                  key={playerIndex}
-                  className={`group relative flex items-center gap-4 rounded-3xl border border-slate-100 bg-white p-4 transition-all duration-500 ${isWinner ? "ring-2 ring-yellow-400 shadow-lg shadow-yellow-100" : "shadow-sm"}`}
-                >
-                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-black text-white shadow-md ${isWinner ? "bg-yellow-400" : theme.bg} ${isWinner ? "text-slate-900" : theme.text}`}>
-                    {rank + 1}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="truncate font-bold text-slate-800">{player.name}</span>
-                      <span className={`font-black ${theme.text}`}>{score} pts</span>
+                  return (
+                    <div key={index} className="flex flex-col items-center justify-end relative">
+                      {/* Icon Container */}
+                      <div 
+                        className={`relative flex items-center justify-center rounded-full shadow-lg transition-all duration-500 border ${theme.bg} ${theme.text}`}
+                        style={{ 
+                          borderColor: theme.ring,  
+                          width: '4rem', height: '4rem', // base size 64px
+                          transform: `scale(${iconScale})`,
+                          transformOrigin: 'bottom center',
+                          zIndex: isWinner ? 10 : 1
+                        }}
+                      >
+                        <User className="h-1/2 w-1/2" />
+                        
+                        {/* Floating points animation */}
+                        {isWinner && (
+                          <div key={currentGameIndex} className="absolute -right-4 -top-4 animate-float-up z-20" style={{ transform: `scale(${1 / iconScale})` }}>
+                            <div className={`flex items-center justify-center h-8 w-8 rounded-full ${theme.bg} ring-2 ${theme.ring} shadow-lg font-black ${theme.text} text-xs`}>
+                              {pointsEarned}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <span className="mt-8 font-bold text-slate-700 truncate max-w-[80px] text-center">{player.name}</span>
+                      <span className="text-sm font-black text-slate-500">{score} pts</span>
                     </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                      <div
-                        className={`h-full transition-all duration-700 ease-out ${isWinner ? "bg-yellow-400" : theme.bg}`}
-                        style={{ width: `${progress}%` }}
-                      />
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Podium Phase */}
+          {phase === "podium" && (
+            <div className="flex-1 flex flex-col animate-bounce-in">
+              <div className="text-center mb-10">
+                <h2 className="text-4xl font-black text-slate-800 uppercase tracking-tight">
+                  Final Standings
+                </h2>
+              </div>
+
+              <div className="flex-1 flex items-end justify-center gap-2 sm:gap-4 mb-2 h-48">
+                {/* 2nd Place Group */}
+                {rankGroups.length > 1 && (
+                  <div className="flex flex-col items-center justify-end animate-fade-in" style={{ animationDelay: '300ms', animationFillMode: 'both' }}>
+                    <div className="flex flex-col items-center mb-2">
+                      {rankGroups[1].playerIndices.map(idx => (
+                        <span key={idx} className="font-bold text-slate-600 truncate max-w-[80px] leading-tight">{players[idx].name}</span>
+                      ))}
+                    </div>
+                    <div className={`w-20 sm:w-24 bg-slate-200 rounded-t-2xl flex flex-col items-center justify-start pt-4 h-32 border-x-2 border-t-2 border-slate-300`}>
+                      <span className="text-2xl font-black text-slate-500">2</span>
+                      <span className="font-bold text-slate-500 text-sm">{rankGroups[1].score} pts</span>
                     </div>
                   </div>
+                )}
+                
+                {/* 1st Place Group */}
+                {rankGroups.length > 0 && (
+                  <div className="flex flex-col items-center justify-end z-10 animate-fade-in" style={{ animationDelay: '100ms', animationFillMode: 'both' }}>
+                    <div className="mb-2 flex flex-col items-center">
+                      {rankGroups[0].playerIndices.map(idx => (
+                        <span key={idx} className="font-black text-slate-900 truncate max-w-[100px] text-lg leading-tight">{players[idx].name}</span>
+                      ))}
+                    </div>
+                    <div className={`w-24 sm:w-28 bg-yellow-300 rounded-t-2xl flex flex-col items-center justify-start pt-4 h-40 shadow-[0_0_30px_rgba(253,224,71,0.5)] border-x-2 border-t-2 border-yellow-400`}>
+                      <span className="text-4xl font-black text-yellow-700">1</span>
+                      <span className="font-bold text-yellow-700">{rankGroups[0].score} pts</span>
+                    </div>
+                  </div>
+                )}
 
-                </div>
-              );
-            })}
-          </div>
+                {/* 3rd Place Group */}
+                {rankGroups.length > 2 && (
+                  <div className="flex flex-col items-center justify-end animate-fade-in" style={{ animationDelay: '500ms', animationFillMode: 'both' }}>
+                    <div className="flex flex-col items-center mb-2">
+                      {rankGroups[2].playerIndices.map(idx => (
+                        <span key={idx} className="font-bold text-slate-600 truncate max-w-[80px] leading-tight">{players[idx].name}</span>
+                      ))}
+                    </div>
+                    <div className={`w-20 sm:w-24 bg-orange-200 rounded-t-2xl flex flex-col items-center justify-start pt-4 h-24 border-x-2 border-t-2 border-orange-300`}>
+                      <span className="text-2xl font-black text-orange-700">3</span>
+                      <span className="font-bold text-orange-700 text-sm">{rankGroups[2].score} pts</span>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-          {winnerRevealed && (
-            <div className="animate-in slide-in-from-bottom-4 fade-in mt-10 flex flex-col gap-3 duration-700 fill-mode-forwards">
-              <button
-                onClick={onRestart}
-                className="flex w-full items-center justify-center gap-3 rounded-[2rem] bg-blue-600 py-5 text-lg font-black text-white shadow-2xl shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
-              >
-                Play Again
-              </button>
-              <div className="flex gap-3">
+              <div className="mt-8 flex gap-3 animate-fade-in" style={{ animationDelay: '1000ms', animationFillMode: 'both' }}>
                 <button
-                  onClick={() => {
-                    setStep(-1);
-                    setVisualScores(Array(players.length).fill(0));
-                    setWinnerRevealed(false);
-                  }}
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-slate-100 py-4 text-sm font-bold text-slate-600 transition-all hover:bg-slate-200 active:scale-95"
+                  onClick={onRestart}
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-blue-600 py-4 text-base font-black text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-95"
                 >
-                  <RefreshCw className="h-4 w-4" /> Replay
+                  <RefreshCw className="h-5 w-5" /> Play Again
                 </button>
                 <button
                   onClick={onClose}
-                  className="flex flex-1 items-center justify-center rounded-2xl border-2 border-slate-100 bg-white py-4 text-sm font-bold text-slate-400 transition-all hover:border-slate-200 hover:text-slate-600 active:scale-95"
+                  className="flex flex-1 items-center justify-center rounded-2xl border-2 border-slate-200 bg-white py-4 text-base font-bold text-slate-500 transition-all hover:border-slate-300 hover:text-slate-700 active:scale-95"
                 >
                   Close
                 </button>
@@ -993,6 +1115,31 @@ const FinalStandingsOverlay = ({
           )}
         </div>
       </div>
+      
+      <style>{`
+        @keyframes floatUp {
+          0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+          20% { opacity: 1; transform: translateY(0px) scale(1.2); }
+          30% { transform: translateY(0px) scale(1); }
+          70% { opacity: 1; transform: translateY(-10px) scale(1); }
+          100% { opacity: 0; transform: translateY(-30px) scale(0.8); }
+        }
+        .animate-float-up {
+          animation: floatUp 1.5s ease-out forwards;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 4px;
+        }
+      `}</style>
     </div>
   );
 };
+
