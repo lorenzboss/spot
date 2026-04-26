@@ -19,14 +19,14 @@
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "^2.0.1",
-    "convex": "1.36.1",
+    "convex": "^1.36.1",
     "lucide-react": "^0.563.0",
     "next": "^16.1.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "^4.2.4",
     "@types/node": "^24.10.9",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
@@ -35,7 +35,7 @@
     "npm-run-all2": "^8.0.4",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "tailwindcss": "^4.1.18",
+    "tailwindcss": "^4.2.4",
     "typescript": "^5.9.3"
   },
   "postcss": {
