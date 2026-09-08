@@ -14,8 +14,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@auth/core": "^0.37.4",
-    "@convex-dev/auth": "^0.0.91",
+    "@auth/core": "^0.41.3",
+    "@convex-dev/auth": "^0.0.95",
     "@convex-dev/eslint-plugin": "^1.1.1",
     "@tanstack/react-table": "^8.21.3",
     "@vercel/analytics": "^2.0.1",
